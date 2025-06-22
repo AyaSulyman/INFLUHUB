@@ -5,14 +5,12 @@ const mongoose = require('mongoose');
 const https = require('https');
 const fs = require('fs');
 const jwt = require('jsonwebtoken'); 
-const bcryptjs = require('bcryptjs')
+const bcryptjs = require('bcryptjs');
 const loginRoutes = require('../routers/user');
-
 
 const app = express();
 
 app.use(express.json());
-
 
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -55,7 +53,6 @@ app.get('/status', verifyRefreshToken, (req, res) => {
   res.status(200).json({ message: "Service is up and running" });
 });
 
-
 app.use('/api', loginRoutes);
 
 const port = process.env.PORT || 3000;
@@ -64,7 +61,15 @@ app.get('/', (req, res) => {
   res.send("success");
 });
 
-
+// Check if the request is coming from Render
+app.use((req, res, next) => {
+  const isRender = req.headers['user-agent'] && req.headers['user-agent'].includes('Render');
+  if (isRender) {
+    // Logic specific to Render
+    console.log("Request from Render detected");
+  }
+  next();
+});
 
 const userRouter = require("../routers/user");
 app.use(userRouter);
