@@ -65,14 +65,14 @@ app.get('/', (req, res) => {
 const userRouter = require("../routers/user");
 app.use(userRouter);
 
-// Check if running in production or development
+
 if (process.env.NODE_ENV === 'production') {
-  // Production: Use HTTP
+
   http.createServer(app).listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
   });
 } else {
-  // Development: Use HTTPS
+  
   const httpsOptions = {
     key: fs.readFileSync('./certs/key.pem'),
     cert: fs.readFileSync('./certs/cert.pem')
