@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose'); 
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const jwt = require('jsonwebtoken'); 
 const bcryptjs = require('bcryptjs');
@@ -61,24 +62,23 @@ app.get('/', (req, res) => {
   res.send("success");
 });
 
-// Check if the request is coming from Render
-app.use((req, res, next) => {
-  const isRender = req.headers['user-agent'] && req.headers['user-agent'].includes('Render');
-  if (isRender) {
-    // Logic specific to Render
-    console.log("Request from Render detected");
-  }
-  next();
-});
-
 const userRouter = require("../routers/user");
 app.use(userRouter);
 
-const httpsOptions = {
-  key: fs.readFileSync('./certs/key.pem'),
-  cert: fs.readFileSync('./certs/cert.pem')
-};
+// Check if running in production or development
+if (process.env.NODE_ENV === 'production') {
+  // Production: Use HTTP
+  http.createServer(app).listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
+} else {
+  // Development: Use HTTPS
+  const httpsOptions = {
+    key: fs.readFileSync('./certs/key.pem'),
+    cert: fs.readFileSync('./certs/cert.pem')
+  };
 
-https.createServer(httpsOptions, app).listen(port, () => {
-  console.log(`Server running securely on https://localhost:${port}`);
-});
+  https.createServer(httpsOptions, app).listen(port, () => {
+    console.log(`Server running securely on https://localhost:${port}`);
+  });
+}
