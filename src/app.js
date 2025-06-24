@@ -45,7 +45,7 @@ const generateRefreshToken = (userId) => {
 };
 
 app.get('/refresh-token', (req, res) => {
-  const userId = req.query.userId || 'defaultUser  Id';
+  const userId = req.query.userId || 'defaultUser Id';
   const newRefreshToken = generateRefreshToken(userId);
   res.json({ refreshToken: newRefreshToken });
 });
