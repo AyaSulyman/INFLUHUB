@@ -5,8 +5,35 @@ const jwt = require('jsonwebtoken');
 const User = require('../data/Signup');
 const router = express.Router();
 const bcryptjs = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const crypto = require ('crypto')
 
-const JWT_SECRET = "975a56e795c8b500c1awc6b96207ad8bcd99b5455311611db70241714513beec6yazzd66247d802fc66a3d703a06ea4a8d110453309089a40566441523";
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+const otps={}
+
+const sendOtpEmail=async (email,otp)=>{
+    const transporter=nodemailer.createTransport({
+        service:'gmail',
+        auth:{
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+
+        }
+    })
+
+    const mailOptions ={
+        from:process.env.EMAIL_USER,
+        to:email,
+        subject:'Your OTP verification',
+        text:`your OTP code is ${otp}`
+    };
+    await transporter.sendMail(mailOptions)
+
+
+
+}
 
 
 router.post('/message', (req, res) => {
@@ -48,21 +75,45 @@ router.post('/signup', async (req, res) => {
         });
         await user.save(); 
 
+        //Generate OTP
+        const otp =crypto.randomInt(100000, 999999).toString();
+        otps[Email]={ otp, expires: Date.now() + 300000 }; 
 
-        const token = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '1h' }); 
-        
-        const userResponse = user.toObject();
-     
-        delete userResponse.Password; 
-        delete userResponse.ConfirmPassword;
+           
+        await sendOtpEmail(Email, otp);
         
        
-        res.status(201).json({ user: userResponse, token }); 
+        res.status(201).json({ message: 'OTP sent to your email for verification' });; 
     } catch (error) {
         
         res.status(400).json({ error: error.message || "Signup failed" }); 
     }
 });
+
+//OTP verification route
+     router.post('/verify-otp', async (req, res) => {
+         console.log("Received request:", req.body); 
+         const { Email, otp } = req.body;
+         const storedOtp = otps[Email];
+         console.log("Stored OTP:", storedOtp);
+
+         if (!storedOtp || storedOtp.otp !== otp || Date.now() > storedOtp.expires) {
+             return res.status(400).json({ error: 'Invalid or expired OTP' });
+         }
+
+         const user = await User.findOne({ Email });
+         const accessToken = jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+         const refreshToken = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '5m' });
+
+         delete otps[Email];
+         res.status(200).json({ accessToken, refreshToken });
+     });
+     
+
+
+
+
+
 
 router.get('/signup', (req, res) => {
     User.find({})
@@ -71,6 +122,7 @@ router.get('/signup', (req, res) => {
 });
 
 
+//Middleware to authenticate access tokens
 const authenticateToken = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
