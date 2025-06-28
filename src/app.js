@@ -8,10 +8,16 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken'); 
 const bcryptjs = require('bcryptjs');
 const loginRoutes = require('../routers/user');
+const cors = require('cors')
+const bodyParser = require('body-parser')
 
 const app = express();
 
 app.use(express.json());
+app.use(cors())
+app.use(bodyParser.json())
+
+
 
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -45,7 +51,7 @@ const generateRefreshToken = (userId) => {
 };
 
 app.get('/refresh-token', (req, res) => {
-  const userId = req.query.userId || 'defaultUser Id';
+  const userId = req.query.userId || 'defaultUser  Id';
   const newRefreshToken = generateRefreshToken(userId);
   res.json({ refreshToken: newRefreshToken });
 });
@@ -55,6 +61,7 @@ app.get('/status', verifyRefreshToken, (req, res) => {
 });
 
 app.use('/api', loginRoutes);
+app.use('/api/registration',loginRoutes)
 
 const port = process.env.PORT || 3000;
 
@@ -73,10 +80,11 @@ if (process.env.NODE_ENV === 'production') {
   });
 } else {
   
-  const httpsOptions = {
-    key: fs.readFileSync('./certs/key.pem'),
-    cert: fs.readFileSync('./certs/cert.pem')
-  };
+      const httpsOptions = {
+       key: fs.readFileSync('./certs/key.pem'),
+       cert: fs.readFileSync('./certs/cert.pem')
+   };
+   
 
   https.createServer(httpsOptions, app).listen(port, () => {
     console.log(`Server running securely on https://localhost:${port}`);
