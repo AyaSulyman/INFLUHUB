@@ -1,0 +1,23 @@
+[
+     {
+        "industry": "industry",
+        "type": ["type"]
+    },
+    {
+        "industry": "FnB",
+        "type": ["Arabic", "Italian", "French"]
+    },
+    {
+        "industry": "Clothes",
+        "type": ["Women", "Men", "Children"]
+    },
+    {
+        "industry": "Cosmetics",
+        "type": ["Skincare", "Bodycare", "Haircare"]
+    },
+    {
+        "industry": "Toys",
+        "type": ["Children","Adults"]
+    }
+]
+

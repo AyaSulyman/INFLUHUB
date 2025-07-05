@@ -1,11 +1,11 @@
-require('dotenv').config(); 
+require('dotenv').config();
 
 const express = require('express');
-const mongoose = require('mongoose'); 
+const mongoose = require('mongoose');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
-const jwt = require('jsonwebtoken'); 
+const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
 const loginRoutes = require('../routers/user');
 const cors = require('cors')
@@ -20,12 +20,12 @@ app.use(bodyParser.json())
 
 
 mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 }).then(() => {
-    console.log("Connected to MongoDB");
+  console.log("Connected to MongoDB");
 }).catch((error) => {
-    console.error("MongoDB connection error:", error);
+  console.error("MongoDB connection error:", error);
 });
 
 const verifyRefreshToken = (req, res, next) => {
@@ -37,10 +37,10 @@ const verifyRefreshToken = (req, res, next) => {
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
     if (err) {
-      console.log("Token verification error:", err); 
+      console.log("Token verification error:", err);
       return res.status(403).send('Invalid refresh token');
     }
-    req.user = user; 
+    req.user = user;
     next();
   });
 };
@@ -61,7 +61,8 @@ app.get('/status', verifyRefreshToken, (req, res) => {
 });
 
 app.use('/api', loginRoutes);
-app.use('/api/registration',loginRoutes)
+app.use('/api/authentication', loginRoutes)
+
 
 const port = process.env.PORT || 3000;
 
@@ -79,12 +80,12 @@ if (process.env.NODE_ENV === 'production') {
     console.log(`Server running on http://localhost:${port}`);
   });
 } else {
-  
-      const httpsOptions = {
-       key: fs.readFileSync('./certs/key.pem'),
-       cert: fs.readFileSync('./certs/cert.pem')
-   };
-   
+
+  const httpsOptions = {
+    key: fs.readFileSync('./certs/key.pem'),
+    cert: fs.readFileSync('./certs/cert.pem')
+  };
+
 
   https.createServer(httpsOptions, app).listen(port, () => {
     console.log(`Server running securely on https://localhost:${port}`);

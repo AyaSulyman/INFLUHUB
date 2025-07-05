@@ -7,8 +7,10 @@ const router = express.Router();
 const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto')
+const fs = require('fs')
+const path = require('path')
 
-
+ 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const otps = {}
@@ -70,7 +72,6 @@ router.post('/signup', async (req, res) => {
         const user = new User({
             Email,
             username,
-
             Password
         });
         await user.save();
@@ -108,12 +109,6 @@ router.post('/verify-otp', async (req, res) => {
     delete otps[Email];
     res.status(200).json({ accessToken, refreshToken });
 });
-
-
-
-
-
-
 
 router.get('/signup', (req, res) => {
     User.find({})
@@ -207,55 +202,233 @@ router.post('/login', async (req, res) => {
 });
 
 
-//Complete Registration Route(Supplier or Retailer)
-router.post('/registration', (req, res) => {
-    const { userType, industry, degree, isFreelancer, brand, digitalPresence } = req.body
+//Profile-Onboarding
+
+// Load JSON files
+const industries = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/industries.json'), 'utf-8'));
+const capital = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Capitals.json'), 'utf-8'));
+const degree = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Degrees.json'), 'utf-8'));
+
+router.post('/profile-onboarding-submit', async (req, res) => {
+    const {
+        email,
+        username: requestedUsername,
+        CountryCode,
+        PhoneNumber,
+        WorkType,
+        userType,
+        Industry,
+        Degree,
+        isFreelancer,
+        Type,
+        Brand,
+        Capital,
+        DigitalPresence
+    } = req.body;
 
     try {
-        if (userType == "Supplier") {
-            if (!industry || !degree || typeof isFreelancer === "undefined") {
-                res.status(400).json({ message: "All fields are required" })
-            } else {
-                (
-                    res.status(200).json({
-                        message: "Registered as Supplier",
-                        data: {
-                            userType,
-                            industry,
-                            degree,
-                            isFreelancer
-                        }
-                    })
-                )
-            }
-
+        if (!email || !CountryCode || !PhoneNumber || !WorkType || !userType) {
+            return res.status(400).json({ error: "All required fields must be filled." });
         }
-        else if (userType == "Retailer") {
-            if (!industry || !brand || typeof digitalPresence === "undefined") {
-                res.status(400).json({ message: "All fields are required" })
-            }
-            else {
-                (
-                    res.status(200).json({
-                        message: "Registered as Retailer",
-                        data: {
-                            userType,
-                            industry,
-                            brand,
-                            digitalPresence
-                        }
-                    })
-                )
-            }
+
+        if (WorkType !== "Influencer" && WorkType !== "Business Owner") {
+            return res.status(400).json({ error: "Invalid WorkType" });
         }
+
+        const user = await User.findOne({ Email: email });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const username = requestedUsername || email.split('@')[0];
+        user.username = username;
+        user.CountryCode = CountryCode;
+        user.PhoneNumber = PhoneNumber;
+        user.WorkType = WorkType;
+        user.userType = userType;
+
+        //Retailer logic
+        if (userType === "Retailer") {
+            if (!Industry || !Degree || typeof isFreelancer === "undefined") {
+                return res.status(400).json({ message: "All Retailer fields are required" });
+            }
+
+            const industryObject = industries.find(ind => ind.industry.toLowerCase() === Industry.toLowerCase());
+            if (!industryObject) {
+                return res.status(400).json({ message: "Invalid Industry selected" });
+            }
+
+            const degreeOptions = degree[0]?.Degree || [];
+            if (!degreeOptions.includes(Degree)) {
+                return res.status(400).json({ message: "Invalid Degree selected" });
+            }
+
+            user.Industry = Industry;
+            user.Degree = Degree;
+            user.isFreelancer = isFreelancer;
+
+            await user.save();
+
+            return res.status(200).json({
+                message: "Registered as Retailer",
+                data: {
+                    username,
+                    CountryCode,
+                    PhoneNumber,
+                    WorkType,
+                    userType,
+                    Industry,
+                    Degree,
+                    isFreelancer
+                }
+            });
+        }
+
+        //Supplier logic
+        if (userType === "Supplier") {
+            if (!Industry || !Brand || !Type || !Capital || typeof DigitalPresence === "undefined") {
+                return res.status(400).json({ message: "All Supplier fields are required" });
+            }
+
+            const industryObject = industries.find(ind => ind.industry.toLowerCase() === Industry.toLowerCase());
+            if (!industryObject) {
+                return res.status(400).json({ message: "Invalid Industry selected" });
+            }
+
+            if (!industryObject.type || !industryObject.type.includes(Type)) {
+                return res.status(400).json({ message: "Invalid Type(s) selected" });
+            }
+
+            const capitalOptions = capital[0]?.Capital?.map(c => c.trim()) || [];
+            if (!capitalOptions.includes(Capital.trim())) {
+                return res.status(400).json({ message: "Invalid Capital selected" });
+            }
+
+
+            user.Industry = Industry;
+            user.Brand = Brand;
+            user.Type = Type;
+            user.Capital = Capital;
+            user.DigitalPresence = DigitalPresence;
+
+            await user.save();
+
+            return res.status(200).json({
+                message: "Registered as Supplier",
+                data: {
+                    username,
+                    CountryCode,
+                    PhoneNumber,
+                    WorkType,
+                    userType,
+                    Industry,
+                    Type,
+                    Brand,
+                    Capital,
+                    DigitalPresence
+                }
+            });
+        }
+
+        return res.status(400).json({ message: "Invalid userType" });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: error.message || "Error updating profile" });
     }
-    catch (error) {
-        res.status(500).send(error)
+});
 
+router.post('/check-username', async (req, res) => {
+    const { username } = req.body;
+
+    if (!username) {
+        return res.status(400).json({ message: "Username is required" });
     }
 
+    const user = await User.findOne({ username });
+    if (user) {
+        return res.status(400).json({ message: "Username already exists" });
+    }
 
+    return res.status(200).json({ message: "Username is available" });
+});
+
+router.get('/profile-onboarding', (req, res) => {
+    try {
+        res.status(200).json({
+            industries,
+            degrees: degree,
+            capitals: capital
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to load onboarding options" });
+    }
+});
+
+
+//Forgot Password Route
+router.post('/forgot-password', async (req, res) => {
+    const Email = req.body.Email
+    try {
+        const user = await User.findOne({ Email: Email });
+        if (!user) {
+            return res.status(400).json({ error: "User not found" });
+        }
+        //Generate OTP
+        const otp = crypto.randomInt(100000, 999999).toString();
+        otps[Email] = { otp, expires: Date.now() + 300000 };
+
+
+        await sendOtpEmail(Email, otp);
+
+
+        res.status(201).json({ message: 'OTP sent to your email for verification' });;
+    } catch (error) {
+
+        res.status(400).json({ error: error.message || "Error processing request" });
+    }
+})
+
+
+//verify OTP reset
+router.post('/verify-otp-reset', async (req, res) => {
+    const { Email, otp } = req.body;
+    const storedOtp = otps[Email];
+    console.log("Stored OTP:", storedOtp);
+
+    if (!storedOtp || storedOtp.otp !== otp || Date.now() > storedOtp.expires) {
+        return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+
+    delete otps[Email];
+    return res.status(200).json({ message: "OTP verified successfully, you may reset your password" });
 
 })
+
+
+//Reset password
+router.post('/reset-password', async (req, res) => {
+    const { Email, newPassword } = req.body
+    console.log("new password",newPassword)
+
+    try {
+        const hashedPassword = await bcryptjs.hash(newPassword, 10)
+        const user = await User.findOneAndUpdate({ Email }, { Password: hashedPassword }, { new: true })
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        return res.status(200).json({ message: "Password reset successfully" });
+
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message || "Error resetting password" });
+
+    }
+})
+
+
+
 
 module.exports = router;
