@@ -10,7 +10,7 @@ const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 
- 
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const otps = {}
@@ -353,6 +353,36 @@ router.post('/check-username', async (req, res) => {
     return res.status(200).json({ message: "Username is available" });
 });
 
+router.get('/profile-onboarding-submit', async (req, res) => {
+    try {
+        const data = await User.find({});
+        if (data.length === 0) {
+            return res.status(200).json([]);
+        }
+        res.status(200).send(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+});
+
+
+router.get('/profile-onboarding-submit/:_id', async (req, res) => {
+    try {
+        const _id = req.params._id
+        const data = await User.findById(_id);
+
+        if (!data) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        res.status(200).json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+});
+
+
 router.get('/profile-onboarding', (req, res) => {
     try {
         res.status(200).json({
@@ -365,6 +395,7 @@ router.get('/profile-onboarding', (req, res) => {
         res.status(500).json({ error: "Failed to load onboarding options" });
     }
 });
+
 
 
 //Forgot Password Route
@@ -410,7 +441,7 @@ router.post('/verify-otp-reset', async (req, res) => {
 //Reset password
 router.post('/reset-password', async (req, res) => {
     const { Email, newPassword } = req.body
-    console.log("new password",newPassword)
+    console.log("new password", newPassword)
 
     try {
         const hashedPassword = await bcryptjs.hash(newPassword, 10)
