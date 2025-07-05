@@ -26,11 +26,11 @@ const UserSchema = new mongoose.Schema({
         require: true,
         trim: true,
         minlength: 8,
-         validate(value){
-            let password=new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])")
-           if ( !password.test(value)){
-            throw new Error("password must included uppercase,lowercase,number ,and special characters")
-           }
+        validate(value) {
+            let password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])")
+            if (!password.test(value)) {
+                throw new Error("password must included uppercase,lowercase,number ,and special characters")
+            }
         }
     },
 
@@ -40,37 +40,90 @@ const UserSchema = new mongoose.Schema({
         trim: true,
         minlength: 8,
         validate(val) {
-            if (val.length < 8) { 
+            if (val.length < 8) {
                 throw new Error("password must be greater than 8");
             }
         }
     },
 
-    CountryCode:{
-        type:Number,
-        require:true,
-        trim:true,
-  
+    CountryCode: {
+        type: Number,
+        require: true,
+        trim: true,
+
     },
-    PhoneNumber:{
-        type:Number,
-        require:true,
-        trim:true,
-        unique:true
-        
+    PhoneNumber: {
+        type: Number,
+        require: true,
+        trim: true,
+        unique: true
+
+    },
+    userType: {
+        type: String,
+        require: true
+    },
+    WorkType: {
+        type: String,
+        enum: ['Influencer', 'Business Owner'],
+        require: true
+    },
+    Industry: {
+        type: String,
+        require: function(){
+            return this.userType === "Supplier" || this.userType === "Retailer"
+        }
+    },
+    Degree: {
+        type: String,
+        require: function(){
+        return this.userType === "Retailer"    
+        }
+    },
+   
+    Type: {
+        type: String,
+        require: function(){
+        return this.userType === "Supplier"      
+        }
+    },
+    Brand: {
+        type: String,
+        require: function(){
+            return this.userType === "Supplier"
+        }
+    },
+    Capital: {
+        type: String,
+        require:  function(){
+            return this.userType === "Supplier"
+        }
+    },
+    DigitalPresence: {
+        type: String,
+        require: function() {
+            return this.userType === 'Supplier';
+        }
+    },
+    isFreelancer: {
+        type: String,
+        require: function() {
+            return this.userType === 'Retailer';
+        }
     }
+
 }, {
-    timestamps: true 
+    timestamps: true
 });
 
 
-UserSchema.pre("save", async function (next) { 
+UserSchema.pre("save", async function (next) {
     const user = this;
-  
+
     if (user.isModified('Password')) {
         user.Password = await bcryptjs.hash(user.Password, 10);
     }
-    next(); 
+    next();
 });
 
 UserSchema.statics.findByCredentials = async function (email, password) {
