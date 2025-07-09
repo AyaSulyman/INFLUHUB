@@ -67,6 +67,10 @@ router.post('/signup', async (req, res) => {
             return res.status(400).json({ error: 'User  with this email already exists' });
         }
 
+        if (!Email.includes('gmail') || !Email.endsWith('.com')) {
+            return res.status(400).json({ error: "Email must contain 'gmail' and end with '.com'" });
+        }
+
         const username = Email.split('@')[0];
 
         const user = new User({
@@ -74,6 +78,7 @@ router.post('/signup', async (req, res) => {
             username,
             Password
         });
+
         await user.save();
 
         //Generate OTP

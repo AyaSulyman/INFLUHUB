@@ -11,6 +11,7 @@ const loginRoutes = require('../routers/user');
 const cors = require('cors')
 const bodyParser = require('body-parser')
 
+
 const app = express();
 
 app.use(express.json());
@@ -28,6 +29,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.error("MongoDB connection error:", error);
 });
 
+  
 const verifyRefreshToken = (req, res, next) => {
   const refreshToken = req.headers['refresh-token'];
   console.log("Received refresh token:", refreshToken);
@@ -64,6 +66,7 @@ app.use('/api', loginRoutes);
 app.use('/api/authentication', loginRoutes)
 
 
+
 const port = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
@@ -81,13 +84,14 @@ if (process.env.NODE_ENV === 'production') {
   });
 } else {
 
-  const httpsOptions = {
-    key: fs.readFileSync('./certs/key.pem'),
-    cert: fs.readFileSync('./certs/cert.pem')
-  };
+const httpsOptions = {
+  key: fs.readFileSync('./certs/key.pem'),
+  cert: fs.readFileSync('./certs/cert.pem')
+};
+
+https.createServer(httpsOptions, app).listen(443, '0.0.0.0', () => {
+  console.log(`Server running on https://webInfluhub.com`);
+});
 
 
-  https.createServer(httpsOptions, app).listen(port, () => {
-    console.log(`Server running securely on https://localhost:${port}`);
-  });
 }
