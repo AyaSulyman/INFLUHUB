@@ -90,7 +90,7 @@ const httpsOptions = {
 };
 
 https.createServer(httpsOptions, app).listen(443, '0.0.0.0', () => {
-  console.log(`Server running on https://webInfluhub.com`);
+  console.log(`Server running on https://influhub-1.onrender.com`);
 });
 
 
