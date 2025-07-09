@@ -80,7 +80,7 @@ app.use(userRouter);
 if (process.env.NODE_ENV === 'production') {
 
   http.createServer(app).listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on http://influhub-1.onrender.com`);
   });
 } else {
 
