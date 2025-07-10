@@ -56,7 +56,7 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         require: true,
         trim: true,
-        unique: true
+       
 
     },
     userType: {
