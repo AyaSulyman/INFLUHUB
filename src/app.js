@@ -89,7 +89,7 @@ const httpsOptions = {
   cert: fs.readFileSync('./certs/cert.pem')
 };
 
-https.createServer(httpsOptions, app).listen(443, '0.0.0.0', () => {
+https.createServer(httpsOptions, app).listen(port,()=> {
   console.log(`Server running on https://influhub-1.onrender.com`);
 });
 
