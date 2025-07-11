@@ -85,14 +85,9 @@ if (process.env.NODE_ENV === 'production') {
   });
 } else {
 
-const httpsOptions = {
-  key: fs.readFileSync('./certs/key.pem'),
-  cert: fs.readFileSync('./certs/cert.pem')
-};
-
-https.createServer(httpsOptions, app).listen(port,()=> {
-  console.log(`Server running on https://influhub-1.onrender.com`);
-});
+app.listen(process.env.PORT || 3000 ,()=>{
+   console.log(`Server running on https://influhub-1.onrender.com`);
+})
 
 
 }
