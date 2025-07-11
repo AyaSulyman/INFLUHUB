@@ -388,10 +388,14 @@ router.get('/profile-onboarding-submit/:_id', async (req, res) => {
 });
 
 
-router.get('/profile-onboarding', (req, res) => {
+router.get('/profile-onboarding', async (req, res) => {
     try {
+        const industriesWithSuppliers = industries.carousel.map(industry => {
+            const suppliers = getSuppliersByIndustry(industry.industry); 
+            return { ...industry, Suppliers: suppliers };
+        });
         res.status(200).json({
-            industries,
+            industries: industriesWithSuppliers,
             degrees: degree,
             capitals: capital
         });
@@ -400,6 +404,7 @@ router.get('/profile-onboarding', (req, res) => {
         res.status(500).json({ error: "Failed to load onboarding options" });
     }
 });
+
 
 
 
@@ -465,6 +470,39 @@ router.post('/reset-password', async (req, res) => {
 })
 
 
+
+//Get all suppliers based on industry
+router.post('/supplier-service', async (req, res) => {
+    try {
+        const { userType, userId } = req.body
+        if (!userType || !userId) {
+            return res.status(400).json({ error: "userType and userId are required." });
+        }
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+
+        }
+        else if (userType == 'Retailer'){
+            const industry = user.Industry
+            const suppliers = getSuppliersByIndustry(industry)
+            return res.status(200).json({suppliers})
+
+        }
+        return res.status(400).json({error:"Invalid usertype"})
+
+    }
+    catch(error) {
+        res.status(500).json({error:"Internal server error"})
+
+    }
+
+})
+
+const getSuppliersByIndustry = (industry) => {
+    const industryData = industries.carousel.find(item => item.industry.toLowerCase() === industry.toLowerCase());
+    return industryData ? industryData.Suppliers : [];
+};
 
 
 module.exports = router;
