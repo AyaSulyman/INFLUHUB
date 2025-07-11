@@ -62,8 +62,9 @@ app.get('/status', verifyRefreshToken, (req, res) => {
   res.status(200).json({ message: "Service is up and running" });
 });
 
-app.use('/api', loginRoutes);
+
 app.use('/api/authentication', loginRoutes)
+app.use('/app/dashboard')
 
 
 

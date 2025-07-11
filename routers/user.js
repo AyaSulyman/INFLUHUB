@@ -388,14 +388,10 @@ router.get('/profile-onboarding-submit/:_id', async (req, res) => {
 });
 
 
-router.get('/profile-onboarding', async (req, res) => {
+router.get('/profile-onboarding', (req, res) => {
     try {
-        const industriesWithSuppliers = industries.carousel.map(industry => {
-            const suppliers = getSuppliersByIndustry(industry.industry); 
-            return { ...industry, Suppliers: suppliers };
-        });
         res.status(200).json({
-            industries: industriesWithSuppliers,
+            industries,
             degrees: degree,
             capitals: capital
         });
@@ -404,7 +400,6 @@ router.get('/profile-onboarding', async (req, res) => {
         res.status(500).json({ error: "Failed to load onboarding options" });
     }
 });
-
 
 
 
@@ -469,8 +464,6 @@ router.post('/reset-password', async (req, res) => {
     }
 })
 
-
-
 //Get all suppliers based on industry
 router.post('/supplier-service', async (req, res) => {
     try {
@@ -503,7 +496,6 @@ const getSuppliersByIndustry = (industry) => {
     const industryData = industries.carousel.find(item => item.industry.toLowerCase() === industry.toLowerCase());
     return industryData ? industryData.Suppliers : [];
 };
-
 
 
 module.exports = router;
