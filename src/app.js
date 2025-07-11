@@ -64,6 +64,7 @@ app.get('/status', verifyRefreshToken, (req, res) => {
 
 app.use('/app/dashboard', loginRoutes);
 app.use('/api/authentication', loginRoutes)
+app.use('/api', loginRoutes)
 
 
 
