@@ -5,10 +5,10 @@
       "type": ["type"],
       "Suppliers": [
         {
-          "Image": "img",
-          "Username": "username",
-          "Email": "email",
-          "PhoneNumber": "phonenumber"
+          "Image": "https://cxscoop.com/wp-content/uploads/2023/07/Univar_Solutions_1280x720.png",
+          "Username": "Sample Supplier",
+          "Email": "sample@example.com",
+          "PhoneNumber": "+1234567890"
         }
       ]
     },
@@ -41,13 +41,13 @@
       "type": ["Women", "Men", "Children"],
       "Suppliers": [
         {
-          "Image": "https://example.com/image1.jpg",
+          "Image": "https://cxscoop.com/wp-content/uploads/2023/07/Univar_Solutions_1280x720.png",
           "Username": "Clothing Supplier 1",
           "Email": "clothing1@example.com",
           "PhoneNumber": "+1 800-123-4567"
         },
         {
-          "Image": "https://example.com/image2.jpg",
+          "Image": "https://www.bopdesign.com/wp-content/uploads/2023/09/felbro-1.jpg",
           "Username": "Clothing Supplier 2",
           "Email": "clothing2@example.com",
           "PhoneNumber": "+1 800-234-5678"
@@ -59,13 +59,13 @@
       "type": ["Skincare", "Bodycare", "Haircare"],
       "Suppliers": [
         {
-          "Image": "https://example.com/image3.jpg",
+          "Image": "https://gxo.com/wp-content/uploads/2023/02/Earnings-pic-option-1.jpg",
           "Username": "Cosmetics Supplier 1",
           "Email": "cosmetics1@example.com",
           "PhoneNumber": "+1 800-345-6789"
         },
         {
-          "Image": "https://example.com/image4.jpg",
+          "Image": "https://cxscoop.com/wp-content/uploads/2023/07/Univar_Solutions_1280x720.png",
           "Username": "Cosmetics Supplier 2",
           "Email": "cosmetics2@example.com",
           "PhoneNumber": "+1 800-456-7890"
@@ -77,13 +77,13 @@
       "type": ["Children", "Adults"],
       "Suppliers": [
         {
-          "Image": "https://example.com/image5.jpg",
+          "Image": "https://www.bopdesign.com/wp-content/uploads/2023/09/felbro-1.jpg",
           "Username": "Toys Supplier 1",
           "Email": "toys1@example.com",
           "PhoneNumber": "+1 800-567-8901"
         },
         {
-          "Image": "https://example.com/image6.jpg",
+          "Image": "https://www.bopdesign.com/wp-content/uploads/2023/09/felbro-1.jpg",
           "Username": "Toys Supplier 2",
           "Email": "toys2@example.com",
           "PhoneNumber": "+1 800-678-9012"

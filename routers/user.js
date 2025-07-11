@@ -210,7 +210,7 @@ router.post('/login', async (req, res) => {
 //Profile-Onboarding
 
 // Load JSON files
-const industries = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/industries.json'), 'utf-8'));
+const industries = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/industries_base64.json'), 'utf-8'));
 const capital = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Capitals.json'), 'utf-8'));
 const degree = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Degrees.json'), 'utf-8'));
 
