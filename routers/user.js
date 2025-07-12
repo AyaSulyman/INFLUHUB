@@ -294,7 +294,7 @@ router.post('/profile-onboarding-submit', async (req, res) => {
                 return res.status(400).json({ message: "All Supplier fields are required" });
             }
 
-            const industryObject = industries.find(ind => ind.industry.toLowerCase() === Industry.toLowerCase());
+            const industryObject = industries.carousel.find(ind => ind.industry.toLowerCase() === Industry.toLowerCase());
             if (!industryObject) {
                 return res.status(400).json({ message: "Invalid Industry selected" });
             }
