@@ -87,12 +87,7 @@ const UserSchema = new mongoose.Schema({
         return this.userType === "Supplier"      
         }
     },
-    Brand: {
-        type: String,
-        require: function(){
-            return this.userType === "Supplier"
-        }
-    },
+   
     Capital: {
         type: String,
         require:  function(){

@@ -226,7 +226,6 @@ router.post('/profile-onboarding-submit', async (req, res) => {
         Degree,
         isFreelancer,
         Type,
-        Brand,
         Capital,
         DigitalPresence
     } = req.body;
@@ -291,7 +290,7 @@ router.post('/profile-onboarding-submit', async (req, res) => {
 
         //Supplier logic
         if (userType === "Supplier") {
-            if (!Industry || !Brand || !Type || !Capital || typeof DigitalPresence === "undefined") {
+            if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
                 return res.status(400).json({ message: "All Supplier fields are required" });
             }
 
@@ -311,7 +310,6 @@ router.post('/profile-onboarding-submit', async (req, res) => {
 
 
             user.Industry = Industry;
-            user.Brand = Brand;
             user.Type = Type;
             user.Capital = Capital;
             user.DigitalPresence = DigitalPresence;
@@ -328,7 +326,6 @@ router.post('/profile-onboarding-submit', async (req, res) => {
                     userType,
                     Industry,
                     Type,
-                    Brand,
                     Capital,
                     DigitalPresence
                 }
