@@ -388,7 +388,7 @@ router.get('/profile-onboarding-submit/:_id', async (req, res) => {
 router.get('/profile-onboarding', async (req, res) => {
     try {
         const industriesWithSuppliers = industries.carousel.map(industry => {
-            const suppliers = getSuppliersByIndustry(industry.industry); 
+            const suppliers = getSuppliersByIndustry(industry.industry);
             return { ...industry, Suppliers: suppliers };
         });
         res.status(200).json({
@@ -472,7 +472,7 @@ router.post('/reset-password', async (req, res) => {
 router.post('/supplier-service', async (req, res) => {
     try {
         const { userId } = req.body;
-        
+
         if (!userId) {
             return res.status(400).json({ error: "userId is required." });
         }
@@ -482,9 +482,9 @@ router.post('/supplier-service', async (req, res) => {
             return res.status(404).json({ error: "User not found." });
         }
 
-       
+
         if (user.userType === 'Supplier') {
-            return res.status(403).json({ 
+            return res.status(403).json({
                 error: "Access denied. Suppliers cannot use this service.",
                 actualUserType: user.userType
             });
@@ -496,7 +496,7 @@ router.post('/supplier-service', async (req, res) => {
             return res.status(200).json({ suppliers });
         }
 
-        return res.status(403).json({ 
+        return res.status(403).json({
             error: "Access denied. Unknown user type.",
             actualUserType: user.userType
         });
@@ -513,5 +513,26 @@ const getSuppliersByIndustry = (industry) => {
 };
 
 
+// Dashboard Section
+const flags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Flags64.json'), 'utf-8'));
+
+router.get('/home', async (req, res) => {
+    try {
+        const email = req.query.Email;
+        if (!email) return res.status(400).json({ error: "Email required" });
+
+        const user = await User.findOne({ Email: email });
+        if (!user) return res.status(400).json({ error: "User not found" });
+
+        if (user.WorkType === "Retailer") {
+            return res.json(flags.carousel);
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Server error" });
+    }
+});
 
 module.exports = router;

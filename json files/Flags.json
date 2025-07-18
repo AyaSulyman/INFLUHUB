@@ -1,0 +1,107 @@
+{
+  "carousel": [
+    {
+      "FEATURED": [
+        {
+          "title": "Lorem ipsum dolor sit amet, consectetur"
+        },
+        {
+          "id": "01",
+          "image": "../images/mart.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "02",
+          "image": "../images/etsy.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "03",
+          "image": "../images/pypit.png",
+          "username": "961Mart"
+        }
+      ]
+    },
+    {
+      "HOT PICKS": [
+        {
+          "title": "Lorem ipsum dolor sit amet, consectetur"
+        },
+        {
+          "id": "04",
+          "image": "../images/lorem.png",
+          "username": "Lorem"
+        },
+        {
+          "id": "05",
+          "image": "../images/berserk.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "06",
+          "image": "../images/mart.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "07",
+          "image": "../images/forbes.png",
+          "username": "Forbes"
+        }
+      ]
+    },
+    {
+      "LAST CHANCE": [
+        {
+          "title": "Lorem ipsum dolor sit amet, consectetur"
+        },
+        {
+          "id": "08",
+          "image": "../images/mart.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "09",
+          "image": "../images/max.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "10",
+          "image": "../images/pngtree.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "11",
+          "image": "../images/hp.png",
+          "username": "961Mart"
+        }
+      ]
+    },
+    {
+      "COMPETITORS": [
+        {
+          "title": "Lorem ipsum dolor sit amet, consectetur"
+        },
+        {
+          "id": "12",
+          "image": "../images/libro.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "13",
+          "image": "../images/mirlaco.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "14",
+          "image": "../images/kenne.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "15",
+          "image": "../images/deepseek.png",
+          "username": "961Mart"
+        }
+      ]
+    }
+  ]
+}
