@@ -518,22 +518,20 @@ const flags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Fla
 
 router.get('/home', async (req, res) => {
     try {
-        const email = req.query.Email;
-        if (!email) return res.status(400).json({ error: "Email required" });
-
-        const user = await User.findOne({ Email: email });
-        if (!user) return res.status(400).json({ error: "User not found" });
-
-        if (user.WorkType && user.WorkType.trim().toLowerCase() === "retailer") {
-            return res.json(flags.carousel);
+        const email = req.query.Email; 
+        const user = await User.findOne({ Email: email }); 
+        if (!user) {
+            return res.status(400).json({ error: "Unable to find user" });
+        } else if (user.userType === "Retailer") {
+            return res.json(flags.carousel); 
         } else {
-            return res.status(403).json({ error: "Access denied" });
+            return res.status(403).json({ error: "Access denied" }); 
         }
-
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Server error" });
+    } catch (error) {
+        console.error(error); 
+        return res.status(500).json({ error: "Internal server error" });
     }
 });
+
 
 module.exports = router;
