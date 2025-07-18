@@ -524,11 +524,12 @@ router.get('/home', async (req, res) => {
         const user = await User.findOne({ Email: email });
         if (!user) return res.status(400).json({ error: "User not found" });
 
-        if (user.WorkType === "Retailer") {
+        if (user.WorkType && user.WorkType.trim().toLowerCase() === "retailer") {
             return res.json(flags.carousel);
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
+
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: "Server error" });
