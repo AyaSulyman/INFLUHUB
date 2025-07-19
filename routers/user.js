@@ -515,21 +515,110 @@ const getSuppliersByIndustry = (industry) => {
 
 // Dashboard Section
 const flags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Flags64.json'), 'utf-8'));
+const competitors = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Competitors64.json'), 'utf-8'));
 
-router.get('/home', async (req, res) => {
+router.post('/home-dashboard', async (req, res) => {
     try {
-        const email = req.query.Email; 
-        const user = await User.findOne({ Email: email }); 
+        const email = req.body.email;
+        const user = await User.findOne({ Email: email });
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Retailer") {
-            return res.json(flags.carousel); 
+            return res.json(flags.carousel);
+        } else if (user.userType === "Supplier") {
+            return res.json(competitors.carousel);
         } else {
-            return res.status(403).json({ error: "Access denied" }); 
+            return res.status(403).json({ error: "Access denied" });
         }
     } catch (error) {
-        console.error(error); 
+        console.error(error);
         return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+router.get('/getAllFeaturedSuppliers', async (req, res) => {
+    try {
+        const email = req.query.email;
+        const user = await User.findOne({ Email: email });
+        if (!user) {
+            return res.status(400).json({ error: "Unable to find user" });
+        } else if (user.userType === "Supplier") {
+            const featuredCategory = flags.carousel.find(category => category.FEATURED);
+            return res.json(featuredCategory ? featuredCategory.FEATURED : []);
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Unable to find featured suppliers" });
+    }
+});
+
+router.get('/getAllHotPickedSuppliers', async (req, res) => {
+    try {
+        const email = req.query.email;
+        const user = await User.findOne({ Email: email });
+        if (!user) {
+            return res.status(400).json({ error: "Unable to find user" });
+        } else if (user.userType === "Supplier") {
+            const hotPicksCategory = flags.carousel.find(category => category["HOT PICKS"]);
+            return res.json(hotPicksCategory ? hotPicksCategory["HOT PICKS"] : []);
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Unable to find hot picked suppliers" });
+    }
+});
+
+router.get('/getCompetitors', async (req, res) => {
+    try {
+        const email = req.query.email;
+        const user = await User.findOne({ Email: email });
+        if (!user) {
+            return res.status(400).json({ error: "Unable to find user" });
+        } else if (user.userType === "Retailer") {
+            const competitorsCategory = competitors.carousel.find(category => category["COMPETITORS"]);
+            return res.json(competitorsCategory ? competitorsCategory["COMPETITORS"] : []);
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Unable to find Competitors" });
+    }
+});
+
+
+//get Retailer of the same industry
+const getRetailersBySameIndustry = async (industry, _id) => {
+    if (!industry) return [];
+
+    try {
+        return await User.find({
+            userType: "Retailer",
+            Industry: { $regex: new RegExp(industry, 'i') },
+            _id: { $ne: _id }
+        }).select('-Password');
+    } catch (error) {
+        console.error('Error fetching retailers:', error);
+        return [];
+    }
+};
+
+router.post('/get-same-industry-retailers', authenticateToken, async (req, res) => {
+    try {
+        const currentUser = await User.findById(req.user.id);
+        if (!currentUser || currentUser.userType !== "Retailer") {
+            return res.status(403).json({ error: "Access denied" });
+        }
+
+        const matchingRetailers = await getRetailersBySameIndustry(currentUser.Industry, currentUser._id);
+        res.status(200).json(matchingRetailers);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
     }
 });
 

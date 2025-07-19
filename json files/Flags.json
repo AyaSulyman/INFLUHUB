@@ -19,6 +19,26 @@
           "id": "03",
           "image": "../images/pypit.png",
           "username": "961Mart"
+        },
+        {
+          "id": "04",
+          "image": "../images/LOREM1.png",
+          "username": "Lorem"
+        },
+        {
+          "id": "05",
+          "image": "../images/ball.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "06",
+          "image": "../images/wika.jpg",
+          "username": "Ipsum"
+        },
+         {
+          "id": "07",
+          "image": "../images/mscompany.png",
+          "username": "961Mart"
         }
       ]
     },
@@ -28,24 +48,39 @@
           "title": "Lorem ipsum dolor sit amet, consectetur"
         },
         {
-          "id": "04",
+          "id": "08",
           "image": "../images/lorem.png",
           "username": "Lorem"
         },
         {
-          "id": "05",
+          "id": "09",
           "image": "../images/berserk.png",
           "username": "961Mart"
         },
         {
-          "id": "06",
+          "id": "10",
           "image": "../images/mart.png",
           "username": "961Mart"
         },
         {
-          "id": "07",
+          "id": "11",
           "image": "../images/forbes.png",
           "username": "Forbes"
+        },
+        {
+          "id": "12",
+          "image": "../images/bata.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "13",
+          "image": "../images/lion.jpg",
+          "username": "961Mart"
+        },
+        {
+          "id": "14",
+          "image": "../images/nesr.png",
+          "username": "961Mart"
         }
       ]
     },
@@ -55,50 +90,23 @@
           "title": "Lorem ipsum dolor sit amet, consectetur"
         },
         {
-          "id": "08",
+          "id": "15",
           "image": "../images/mart.png",
           "username": "961Mart"
         },
         {
-          "id": "09",
+          "id": "16",
           "image": "../images/max.png",
           "username": "961Mart"
         },
         {
-          "id": "10",
+          "id": "17",
           "image": "../images/pngtree.png",
           "username": "961Mart"
         },
         {
-          "id": "11",
+          "id": "18",
           "image": "../images/hp.png",
-          "username": "961Mart"
-        }
-      ]
-    },
-    {
-      "COMPETITORS": [
-        {
-          "title": "Lorem ipsum dolor sit amet, consectetur"
-        },
-        {
-          "id": "12",
-          "image": "../images/libro.png",
-          "username": "961Mart"
-        },
-        {
-          "id": "13",
-          "image": "../images/mirlaco.png",
-          "username": "961Mart"
-        },
-        {
-          "id": "14",
-          "image": "../images/kenne.png",
-          "username": "961Mart"
-        },
-        {
-          "id": "15",
-          "image": "../images/deepseek.png",
           "username": "961Mart"
         }
       ]
