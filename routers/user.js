@@ -523,9 +523,9 @@ router.post('/home-dashboard', async (req, res) => {
         const user = await User.findOne({ Email: email });
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
-        } else if (user.userType === "Retailer") {
-            return res.json(flags.carousel);
         } else if (user.userType === "Supplier") {
+            return res.json(flags.carousel);
+        } else if (user.userType === "Retailer") {
             return res.json(competitors.carousel);
         } else {
             return res.status(403).json({ error: "Access denied" });
