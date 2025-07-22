@@ -519,7 +519,7 @@ const competitors = JSON.parse(fs.readFileSync(path.join(__dirname, '../json fil
 
 router.post('/home-dashboard', async (req, res) => {
     try {
-        const userId = req.body;
+        const userId = req.body.userId;
         if(!userId){
             return res.status(400).json({ error: "UserId is required" });
         }
