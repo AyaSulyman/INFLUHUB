@@ -519,8 +519,11 @@ const competitors = JSON.parse(fs.readFileSync(path.join(__dirname, '../json fil
 
 router.post('/home-dashboard', async (req, res) => {
     try {
-        const email = req.body.email;
-        const user = await User.findOne({ Email: email });
+        const userId = req.body;
+        if(!userId){
+            return res.status(400).json({ error: "UserId is required" });
+        }
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
