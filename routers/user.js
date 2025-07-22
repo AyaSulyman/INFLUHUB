@@ -115,6 +115,30 @@ router.post('/verify-otp', async (req, res) => {
     res.status(200).json({ accessToken, refreshToken });
 });
 
+// Resend Otp
+router.post('/resend-otp', async (req, res) => {
+    const { Email } = req.body;
+
+    try {
+        const user = await User.findOne({ Email });
+        if (!user) {
+            return res.status(404).json({ error: "User  not found" });
+        }
+
+        const otp = crypto.randomInt(100000, 999999).toString();
+        otps[Email] = { otp, expires: Date.now() + 300000 };
+
+       
+        await sendOtpEmail(Email, otp);
+
+        res.status(200).json({ message: 'OTP has been resent to your email' });
+    } catch (error) {
+        console.error("Error resending OTP:", error);
+        res.status(500).json({ error: error.message || "Failed to resend OTP" });
+    }
+});
+
+
 router.get('/signup', (req, res) => {
     User.find({})
         .then((user) => res.status(200).send(user))
