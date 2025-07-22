@@ -541,8 +541,11 @@ router.post('/home-dashboard', async (req, res) => {
 
 router.get('/getAllFeaturedSuppliers', async (req, res) => {
     try {
-        const email = req.query.email;
-        const user = await User.findOne({ Email: email });
+        const userId = req.query.userId;
+        if(!userId){
+            return res.status(400).json({ error: "userId is required" });
+        }
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
@@ -559,8 +562,11 @@ router.get('/getAllFeaturedSuppliers', async (req, res) => {
 
 router.get('/getAllHotPickedSuppliers', async (req, res) => {
     try {
-        const email = req.query.email;
-        const user = await User.findOne({ Email: email });
+        const userId = req.query.userId;
+         if(!userId){
+            return res.status(400).json({ error: "userId is required" });
+        }
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
@@ -577,8 +583,12 @@ router.get('/getAllHotPickedSuppliers', async (req, res) => {
 
 router.get('/getCompetitors', async (req, res) => {
     try {
-        const email = req.query.email;
-        const user = await User.findOne({ Email: email });
+        const userId = req.query.userId;
+            if(!userId){
+            return res.status(400).json({ error: "userId is required" });
+        }
+
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Retailer") {
