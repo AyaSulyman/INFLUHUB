@@ -1,0 +1,106 @@
+{
+  "carousel": [
+    {
+      "FEATURED": [
+        {
+          "title": "Lorem ipsum dolor sit amet, consectetur"
+        },
+        {
+          "id": "01",
+          "image": "../images/D.png",
+          "username": "Lorem"
+        },
+        {
+          "id": "02",
+          "image": "../images/ball.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "03",
+          "image": "../images/wika.jpg",
+          "username": "Ipsum"
+        },
+        {
+          "id": "04",
+          "image": "../images/mscompany.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "05",
+          "image": "../images/D.png",
+          "username": "Lorem"
+        },
+        {
+          "id": "06",
+          "image": "../images/ball.png",
+          "username": "961Mart"
+        }
+      
+      ]
+    },
+    {
+      " LOW IN STOCK": [
+        {
+          "title": "Lorem ipsum dolor sit amet, consectetur"
+        },
+        {
+          "id": "07",
+          "image": "../images/bata.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "08",
+          "image": "../images/lion.jpg",
+          "username": "961Mart"
+        },
+        {
+          "id": "09",
+          "image": "../images/nesr.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "10",
+          "image": "../images/bata.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "11",
+          "image": "../images/lion.jpg",
+          "username": "961Mart"
+        },
+        {
+          "id": "12",
+          "image": "../images/nesr.png",
+          "username": "961Mart"
+        }
+      ]
+    },
+    {
+      "COMPETITORS": [
+        {
+          "title": "Lorem ipsum dolor sit amet, consectetur"
+        },
+        {
+          "id": "13",
+          "image": "../images/live.jpg",
+          "username": "961Mart"
+        },
+        {
+          "id": "14",
+          "image": "../images/lion.jpg",
+          "username": "961Mart"
+        },
+        {
+          "id": "15",
+          "image": "../images/pngtree.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "16",
+          "image": "../images/golden.png",
+          "username": "961Mart"
+        }
+      ]
+    }
+  ]
+}

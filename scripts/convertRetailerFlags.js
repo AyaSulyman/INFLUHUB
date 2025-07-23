@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const industriesPath = path.join(__dirname, '../json files/Flags.json');
-const outputPath = path.join(__dirname, '../json files/Flags64.json');
+const industriesPath = path.join(__dirname, '../json files/RetailerFlags.json');
+const outputPath = path.join(__dirname, '../json files/RetailerFlags64.json');
 
 const industries = JSON.parse(fs.readFileSync(industriesPath, 'utf-8'));
 

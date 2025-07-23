@@ -22,22 +22,17 @@
         },
         {
           "id": "04",
-          "image": "../images/LOREM1.png",
-          "username": "Lorem"
+          "image": "../images/mart.png",
+          "username": "961Mart"
         },
         {
           "id": "05",
-          "image": "../images/ball.png",
+          "image": "../images/etsy.png",
           "username": "961Mart"
         },
         {
           "id": "06",
-          "image": "../images/wika.jpg",
-          "username": "Ipsum"
-        },
-         {
-          "id": "07",
-          "image": "../images/mscompany.png",
+          "image": "../images/pypit.png",
           "username": "961Mart"
         }
       ]
@@ -48,39 +43,44 @@
           "title": "Lorem ipsum dolor sit amet, consectetur"
         },
         {
-          "id": "08",
+          "id": "07",
           "image": "../images/lorem.png",
           "username": "Lorem"
         },
         {
-          "id": "09",
+          "id": "08",
           "image": "../images/berserk.png",
           "username": "961Mart"
         },
         {
-          "id": "10",
+          "id": "09",
           "image": "../images/mart.png",
           "username": "961Mart"
         },
         {
-          "id": "11",
+          "id": "10",
           "image": "../images/forbes.png",
           "username": "Forbes"
         },
+         {
+          "id": "11",
+          "image": "../images/lorem.png",
+          "username": "Lorem"
+        },
         {
           "id": "12",
-          "image": "../images/bata.png",
+          "image": "../images/berserk.png",
           "username": "961Mart"
         },
         {
           "id": "13",
-          "image": "../images/lion.jpg",
+          "image": "../images/mart.png",
           "username": "961Mart"
         },
         {
           "id": "14",
-          "image": "../images/nesr.png",
-          "username": "961Mart"
+          "image": "../images/forbes.png",
+          "username": "Forbes"
         }
       ]
     },
@@ -107,6 +107,33 @@
         {
           "id": "18",
           "image": "../images/hp.png",
+          "username": "961Mart"
+        }
+      ]
+    },
+    {
+      "COMPETITORS": [
+        {
+          "title": "Lorem ipsum dolor sit amet, consectetur"
+        },
+        {
+          "id": "19",
+          "image": "../images/libro.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "20",
+          "image": "../images/mirlaco.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "21",
+          "image": "../images/kenne.png",
+          "username": "961Mart"
+        },
+        {
+          "id": "22",
+          "image": "../images/deepseek.png",
           "username": "961Mart"
         }
       ]

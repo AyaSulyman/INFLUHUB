@@ -537,9 +537,9 @@ const getSuppliersByIndustry = (industry) => {
 };
 
 
-// Dashboard Section
-const flags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Flags64.json'), 'utf-8'));
-const competitors = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Competitors64.json'), 'utf-8'));
+// Retailer Dashboard Section
+const supplierFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/SupplierFlags64.json'), 'utf-8'));
+const retailerFlags=JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/RetailerFlags64.json'), 'utf-8'));
 
 router.post('/home-dashboard', async (req, res) => {
     try {
@@ -551,9 +551,9 @@ router.post('/home-dashboard', async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
-            return res.json(flags.carousel);
+            return res.json(supplierFlags.carousel);
         } else if (user.userType === "Retailer") {
-            return res.json(competitors.carousel);
+            return res.json(retailerFlags.carousel);
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
