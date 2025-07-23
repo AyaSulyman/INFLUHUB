@@ -621,8 +621,8 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
-            const lowInSrockCategory = supplierFlags.carousel.find(category => category["LOW IN STOCK"]);
-            return res.json(hotPicksCategory ? hotPicksCategory["LOW IN STOCK"] : []);
+            const lowInStockCategory = supplierFlags.carousel.find(category => category["LOW IN STOCK"]);
+            return res.json(lowInStockCategory ? lowInStockCategory["LOW IN STOCK"] : []);
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
