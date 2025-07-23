@@ -614,14 +614,17 @@ router.get('/getAllHotPickedRetailers', async (req, res) => {
 router.get('/getAllLowInStockSuppliers', async (req, res) => {
     try {
         const userId = req.query.userId;
-         if(!userId){
+        if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
         const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
+            console.log('User :', user);
+            console.log('Supplier Flags:', supplierFlags);
             const lowInStockCategory = supplierFlags.carousel.find(category => category["LOW IN STOCK"]);
+            console.log('Low In Stock Category:', lowInStockCategory);
             return res.json(lowInStockCategory ? lowInStockCategory["LOW IN STOCK"] : []);
         } else {
             return res.status(403).json({ error: "Access denied" });
@@ -631,6 +634,7 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
         return res.status(500).json({ error: "Unable to find low in stock suppliers" });
     }
 });
+
 
 router.get('/getCompetitors', async (req, res) => {
     try {
