@@ -647,9 +647,14 @@ router.get('/getCompetitors', async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Retailer") {
-            const competitorsCategory = competitors.carousel.find(category => category["COMPETITORS"]);
+            const competitorsCategory = retailerFlags.carousel.find(category => category["COMPETITORS"]);
             return res.json(competitorsCategory ? competitorsCategory["COMPETITORS"] : []);
-        } else {
+
+        }else if (user.userType === "Supplier") {
+            const competitorsSupplierCategory = supplierFlags.carousel.find(category => category["COMPETITORS"]);
+            return res.json(competitorsSupplierCategory ? competitorsSupplierCategory["COMPETITORS"] : []);
+        }
+         else {
             return res.status(403).json({ error: "Access denied" });
         }
     } catch (error) {
