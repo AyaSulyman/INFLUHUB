@@ -590,7 +590,28 @@ router.get('/getAllFeatured', async (req, res) => {
 });
 
 
-router.get('/getAllHotPickedSuppliers', async (req, res) => {
+router.get('/getAllHotPickedRetailers', async (req, res) => {
+    try {
+        const userId = req.query.userId;
+         if(!userId){
+            return res.status(400).json({ error: "userId is required" });
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(400).json({ error: "Unable to find user" });
+        } else if (user.userType === "Retailer") {
+            const hotPicksCategory = retailerFlags.carousel.find(category => category["HOT PICKS"]);
+            return res.json(hotPicksCategory ? hotPicksCategory["HOT PICKS"] : []);
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Unable to find hot picked retailers" });
+    }
+});
+
+router.get('/getAllLowInStockSuppliers', async (req, res) => {
     try {
         const userId = req.query.userId;
          if(!userId){
@@ -600,14 +621,14 @@ router.get('/getAllHotPickedSuppliers', async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
-            const hotPicksCategory = flags.carousel.find(category => category["HOT PICKS"]);
-            return res.json(hotPicksCategory ? hotPicksCategory["HOT PICKS"] : []);
+            const lowInSrockCategory = supplierFlags.carousel.find(category => category["LOW IN STOCK"]);
+            return res.json(hotPicksCategory ? hotPicksCategory["LOW IN STOCK"] : []);
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Unable to find hot picked suppliers" });
+        return res.status(500).json({ error: "Unable to find low in stock suppliers" });
     }
 });
 
