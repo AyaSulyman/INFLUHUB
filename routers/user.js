@@ -665,11 +665,12 @@ router.get('/getCompetitors', async (req, res) => {
 
 
 //get competitors of the same industry
-const getCompetitorsBySameIndustry = async (industry, _id) => {
+const getCompetitorsBySameIndustry = async (industry, _id, userType) => {
     if (!industry) return [];
 
     try {
         return await User.find({
+            userType: userType,
             Industry: { $regex: new RegExp(industry, 'i') },
             _id: { $ne: _id }
         }).select('-Password');
@@ -679,20 +680,38 @@ const getCompetitorsBySameIndustry = async (industry, _id) => {
     }
 };
 
-router.post('/get-same-industry-competitors', authenticateToken, async (req, res) => {
+// Endpoint for Retailers
+router.post('/get-same-industry-retailers', authenticateToken, async (req, res) => {
     try {
         const currentUser  = await User.findById(req.user.id);
-        if (!currentUser ) {
+        if (!currentUser  || currentUser .userType !== "Retailer") {
             return res.status(403).json({ error: "Access denied" });
         }
 
-        const matchingCompetitors = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id);
-        res.status(200).json(matchingCompetitors);
+        const matchingRetailers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Retailer");
+        res.status(200).json(matchingRetailers);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
     }
 });
+
+// Endpoint for Suppliers
+router.post('/get-same-industry-suppliers', authenticateToken, async (req, res) => {
+    try {
+        const currentUser  = await User.findById(req.user.id);
+        if (!currentUser  || currentUser .userType !== "Supplier") {
+            return res.status(403).json({ error: "Access denied" });
+        }
+
+        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Supplier");
+        res.status(200).json(matchingSuppliers);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 
 module.exports = router;
