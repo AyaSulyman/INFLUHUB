@@ -664,31 +664,30 @@ router.get('/getCompetitors', async (req, res) => {
 });
 
 
-//get Retailer of the same industry
-const getRetailersBySameIndustry = async (industry, _id) => {
+//get competitors of the same industry
+const getCompetitorsBySameIndustry = async (industry, _id) => {
     if (!industry) return [];
 
     try {
         return await User.find({
-            userType: "Retailer",
             Industry: { $regex: new RegExp(industry, 'i') },
             _id: { $ne: _id }
         }).select('-Password');
     } catch (error) {
-        console.error('Error fetching retailers:', error);
+        console.error('Error fetching competitors:', error);
         return [];
     }
 };
 
-router.post('/get-same-industry-retailers', authenticateToken, async (req, res) => {
+router.post('/get-same-industry-competitors', authenticateToken, async (req, res) => {
     try {
-        const currentUser = await User.findById(req.user.id);
-        if (!currentUser || currentUser.userType !== "Retailer") {
+        const currentUser  = await User.findById(req.user.id);
+        if (!currentUser ) {
             return res.status(403).json({ error: "Access denied" });
         }
 
-        const matchingRetailers = await getRetailersBySameIndustry(currentUser.Industry, currentUser._id);
-        res.status(200).json(matchingRetailers);
+        const matchingCompetitors = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id);
+        res.status(200).json(matchingCompetitors);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
