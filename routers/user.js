@@ -563,7 +563,7 @@ router.post('/home-dashboard', async (req, res) => {
     }
 });
 
-router.get('/getAllFeaturedSuppliers', async (req, res) => {
+router.get('/getAllFeatured', async (req, res) => {
     try {
         const userId = req.query.userId;
         if(!userId){
@@ -573,16 +573,22 @@ router.get('/getAllFeaturedSuppliers', async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
-            const featuredCategory = flags.carousel.find(category => category.FEATURED);
+            const featuredCategory = supplierFlags.carousel.find(category => category.FEATURED);
             return res.json(featuredCategory ? featuredCategory.FEATURED : []);
-        } else {
+        } else if (user.userType === "Retailer") {
+            const featuredRetailerCategory = retailerFlags.carousel.find(category => category.FEATURED);
+            return res.json(featuredRetailerCategory ? featuredRetailerCategory.FEATURED : []);
+        } 
+        
+        else {
             return res.status(403).json({ error: "Access denied" });
         }
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Unable to find featured suppliers" });
+        return res.status(500).json({ error: "Unable to find featured suppliers or retailers" });
     }
 });
+
 
 router.get('/getAllHotPickedSuppliers', async (req, res) => {
     try {
