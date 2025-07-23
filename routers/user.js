@@ -623,9 +623,9 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
         } else if (user.userType === "Supplier") {
             console.log('User :', user);
             console.log('Supplier Flags:', supplierFlags);
-            const lowInStockCategory = supplierFlags.carousel.find(category => category["LOW IN STOCK"]);
+            const lowInStockCategory = supplierFlags.carousel.find(category => category[" LOW IN STOCK"]);
             console.log('Low In Stock Category:', lowInStockCategory);
-            return res.json(lowInStockCategory ? lowInStockCategory["LOW IN STOCK"] : []);
+            return res.json(lowInStockCategory ? lowInStockCategory[" LOW IN STOCK"] : []);
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
