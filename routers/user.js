@@ -541,11 +541,12 @@ const supplierFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json f
 const retailerFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/RetailerFlags64.json'), 'utf-8'));
 
 // Retailer Dashboard Route
-router.get('/retailer/dashboard', async (req, res) => {
+// Retailer Dashboard Route
+router.post('/retailer/dashboard', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
-            return res.status(400).json({ error: "User Id is required" });
+            return res.status(400).json({ error: "User  Id is required" });
         }
 
         const user = await User.findById(userId);
@@ -568,11 +569,11 @@ router.get('/retailer/dashboard', async (req, res) => {
 });
 
 // Supplier Dashboard Route
-router.get('/supplier/dashboard', async (req, res) => {
+router.post('/supplier/dashboard', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
-            return res.status(400).json({ error: "User Id is required" });
+            return res.status(400).json({ error: "User  Id is required" });
         }
 
         const user = await User.findById(userId);
@@ -592,6 +593,7 @@ router.get('/supplier/dashboard', async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 });
+
 
 
 
