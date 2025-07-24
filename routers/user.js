@@ -543,17 +543,17 @@ const retailerFlags=JSON.parse(fs.readFileSync(path.join(__dirname, '../json fil
 
 router.post('/home-dashboard', async (req, res) => {
     try {
-        const userId = req.body.userId;
-        if(!userId){
-            return res.status(400).json({ error: "UserId is required" });
+        const userId = req.headers['user-id'];
+        if (!userId) {
+            return res.status(400).json({ error: "User  Id is required" });
         }
         const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
-            return res.json(supplierFlags.carousel);
+            return res.json(supplierFlags.carousel.slice(0, 10)); 
         } else if (user.userType === "Retailer") {
-            return res.json(retailerFlags.carousel);
+            return res.json(retailerFlags.carousel.slice(0, 10)); 
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
@@ -563,10 +563,11 @@ router.post('/home-dashboard', async (req, res) => {
     }
 });
 
+
 router.get('/getAllFeatured', async (req, res) => {
     try {
-        const userId = req.query.userId;
-        if(!userId){
+        const userId = req.headers['user-id']; 
+        if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
         const user = await User.findById(userId);
@@ -578,9 +579,7 @@ router.get('/getAllFeatured', async (req, res) => {
         } else if (user.userType === "Retailer") {
             const featuredRetailerCategory = retailerFlags.carousel.find(category => category.FEATURED);
             return res.json(featuredRetailerCategory ? featuredRetailerCategory.FEATURED : []);
-        } 
-        
-        else {
+        } else {
             return res.status(403).json({ error: "Access denied" });
         }
     } catch (error) {
@@ -590,10 +589,11 @@ router.get('/getAllFeatured', async (req, res) => {
 });
 
 
+
 router.get('/getAllHotPickedRetailers', async (req, res) => {
     try {
-        const userId = req.query.userId;
-         if(!userId){
+        const userId = req.headers['user-id']; 
+        if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
         const user = await User.findById(userId);
@@ -614,8 +614,8 @@ router.get('/getAllHotPickedRetailers', async (req, res) => {
 
 router.get('/getAllLastChanceRetailers', async (req, res) => {
     try {
-        const userId = req.query.userId;
-         if(!userId){
+        const userId = req.headers['user-id']; 
+        if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
         const user = await User.findById(userId);
@@ -629,14 +629,14 @@ router.get('/getAllLastChanceRetailers', async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Unable to find last Chance retailers" });
+        return res.status(500).json({ error: "Unable to find last chance retailers" });
     }
 });
 
 
 router.get('/getAllLowInStockSuppliers', async (req, res) => {
     try {
-        const userId = req.query.userId;
+        const userId = req.headers['user-id']; // Access userId from headers
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
@@ -644,7 +644,7 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
-            console.log('User :', user);
+            console.log('User  :', user);
             console.log('Supplier Flags:', supplierFlags);
             const lowInStockCategory = supplierFlags.carousel.find(category => category[" LOW IN STOCK"]);
             console.log('Low In Stock Category:', lowInStockCategory);
@@ -659,10 +659,11 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
 });
 
 
+
 router.get('/getCompetitors', async (req, res) => {
     try {
-        const userId = req.query.userId;
-            if(!userId){
+        const userId = req.headers['user-id']; 
+        if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
 
@@ -672,17 +673,15 @@ router.get('/getCompetitors', async (req, res) => {
         } else if (user.userType === "Retailer") {
             const competitorsCategory = retailerFlags.carousel.find(category => category["COMPETITORS"]);
             return res.json(competitorsCategory ? competitorsCategory["COMPETITORS"] : []);
-
-        }else if (user.userType === "Supplier") {
+        } else if (user.userType === "Supplier") {
             const competitorsSupplierCategory = supplierFlags.carousel.find(category => category["COMPETITORS"]);
             return res.json(competitorsSupplierCategory ? competitorsSupplierCategory["COMPETITORS"] : []);
-        }
-         else {
+        } else {
             return res.status(403).json({ error: "Access denied" });
         }
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Unable to find Competitors" });
+        return res.status(500).json({ error: "Unable to find competitors" });
     }
 });
 
@@ -704,9 +703,14 @@ const getCompetitorsBySameIndustry = async (industry, _id, userType) => {
 };
 
 // Endpoint for Retailers
-router.post('/get-same-industry-retailers', authenticateToken, async (req, res) => {
+router.post('/get-same-industry-retailers', async (req, res) => {
     try {
-        const currentUser  = await User.findById(req.user.id);
+        const userId = req.headers['user-id']; 
+        if (!userId) {
+            return res.status(400).json({ error: "userId is required" });
+        }
+
+        const currentUser  = await User.findById(userId);
         if (!currentUser  || currentUser .userType !== "Retailer") {
             return res.status(403).json({ error: "Access denied" });
         }
@@ -720,9 +724,14 @@ router.post('/get-same-industry-retailers', authenticateToken, async (req, res) 
 });
 
 // Endpoint for Suppliers
-router.post('/get-same-industry-suppliers', authenticateToken, async (req, res) => {
+router.post('/get-same-industry-suppliers', async (req, res) => {
     try {
-        const currentUser  = await User.findById(req.user.id);
+        const userId = req.headers['user-id'];
+        if (!userId) {
+            return res.status(400).json({ error: "userId is required" });
+        }
+
+        const currentUser  = await User.findById(userId);
         if (!currentUser  || currentUser .userType !== "Supplier") {
             return res.status(403).json({ error: "Access denied" });
         }
@@ -734,7 +743,6 @@ router.post('/get-same-industry-suppliers', authenticateToken, async (req, res) 
         res.status(500).json({ error: "Server error" });
     }
 });
-
 
 
 module.exports = router;
