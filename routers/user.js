@@ -551,9 +551,9 @@ router.post('/home-dashboard', async (req, res) => {
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Supplier") {
-            return res.json(supplierFlags.carousel.slice(0, 10)); 
+            return res.json(supplierFlags.carousel.slice(0, 9)); 
         } else if (user.userType === "Retailer") {
-            return res.json(retailerFlags.carousel.slice(0, 10)); 
+            return res.json(retailerFlags.carousel.slice(0, 9)); 
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
