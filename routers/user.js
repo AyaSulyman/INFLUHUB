@@ -595,29 +595,46 @@ router.get('/supplier/dashboard', async (req, res) => {
 
 
 
-router.get('/getAllFeatured', async (req, res) => {
+// Retailer Featured Route
+router.get('/retailer/featured', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
         const user = await User.findById(userId);
-        if (!user) {
-            return res.status(400).json({ error: "Unable to find user" });
-        } else if (user.userType === "Supplier") {
-            const featuredCategory = supplierFlags.carousel.find(category => category.FEATURED);
-            return res.json(featuredCategory ? featuredCategory.FEATURED : []);
-        } else if (user.userType === "Retailer") {
-            const featuredRetailerCategory = retailerFlags.carousel.find(category => category.FEATURED);
-            return res.json(featuredRetailerCategory ? featuredRetailerCategory.FEATURED : []);
-        } else {
+        if (!user || user.userType !== "Retailer") {
             return res.status(403).json({ error: "Access denied" });
         }
+
+        const featuredRetailerCategory = retailerFlags.carousel.find(category => category.FEATURED);
+        return res.json(featuredRetailerCategory ? featuredRetailerCategory.FEATURED : []);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Unable to find featured suppliers or retailers" });
+        return res.status(500).json({ error: "Unable to find featured retailers" });
     }
 });
+
+// Supplier Featured Route
+router.get('/supplier/featured', async (req, res) => {
+    try {
+        const userId = req.headers['user-id'];
+        if (!userId) {
+            return res.status(400).json({ error: "userId is required" });
+        }
+        const user = await User.findById(userId);
+        if (!user || user.userType !== "Supplier") {
+            return res.status(403).json({ error: "Access denied" });
+        }
+
+        const featuredCategory = supplierFlags.carousel.find(category => category.FEATURED);
+        return res.json(featuredCategory ? featuredCategory.FEATURED : []);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Unable to find featured suppliers" });
+    }
+});
+
 
 
 
