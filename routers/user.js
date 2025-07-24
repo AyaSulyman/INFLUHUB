@@ -537,39 +537,54 @@ const getSuppliersByIndustry = (industry) => {
 };
 
 
-// Retailer Dashboard Section
 const supplierFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/SupplierFlags64.json'), 'utf-8'));
 const retailerFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/RetailerFlags64.json'), 'utf-8'));
 
-router.post('/home-dashboard', async (req, res) => {
+// Retailer Dashboard Route
+router.get('/retailer/dashboard', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
-            return res.status(400).json({ error: "User  Id is required" });
+            return res.status(400).json({ error: "User Id is required" });
         }
+
         const user = await User.findById(userId);
-        if (!user) {
-            return res.status(400).json({ error: "Unable to find user" });
-        }
-
-        let response = {};
-
-        if (user.userType === "Supplier") {
-            response = {
-                featured: supplierFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
-                lowInStock: supplierFlags.carousel.find(category => category[" LOW IN STOCK"])?.[" LOW IN STOCK"].slice(0, 10) || [],
-                competitors: supplierFlags.carousel.find(category => category.COMPETITORS)?.COMPETITORS.slice(0, 10) || []
-            };
-        } else if (user.userType === "Retailer") {
-            response = {
-                featured: retailerFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
-                hotPicks: retailerFlags.carousel.find(category => category["HOT PICKS"])?.["HOT PICKS"].slice(0, 10) || [],
-                lastChance: retailerFlags.carousel.find(category => category["LAST CHANCE"])?.["LAST CHANCE"].slice(0, 10) || [],
-                competitors: retailerFlags.carousel.find(category => category.COMPETITORS)?.COMPETITORS.slice(0, 10) || []
-            };
-        } else {
+        if (!user || user.userType !== "Retailer") {
             return res.status(403).json({ error: "Access denied" });
         }
+
+        const response = {
+            featured: retailerFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
+            hotPicks: retailerFlags.carousel.find(category => category["HOT PICKS"])?.["HOT PICKS"].slice(0, 10) || [],
+            lastChance: retailerFlags.carousel.find(category => category["LAST CHANCE"])?.["LAST CHANCE"].slice(0, 10) || [],
+            competitors: retailerFlags.carousel.find(category => category.COMPETITORS)?.COMPETITORS.slice(0, 10) || []
+        };
+
+        return res.json(response);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// Supplier Dashboard Route
+router.get('/supplier/dashboard', async (req, res) => {
+    try {
+        const userId = req.headers['user-id'];
+        if (!userId) {
+            return res.status(400).json({ error: "User Id is required" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user || user.userType !== "Supplier") {
+            return res.status(403).json({ error: "Access denied" });
+        }
+
+        const response = {
+            featured: supplierFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
+            lowInStock: supplierFlags.carousel.find(category => category[" LOW IN STOCK"])?.[" LOW IN STOCK"].slice(0, 10) || [],
+            competitors: supplierFlags.carousel.find(category => category.COMPETITORS)?.COMPETITORS.slice(0, 10) || []
+        };
 
         return res.json(response);
     } catch (error) {
