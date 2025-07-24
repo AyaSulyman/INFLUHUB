@@ -684,7 +684,7 @@ router.get('/getAllLastChanceRetailers', async (req, res) => {
 
 router.get('/getAllLowInStockSuppliers', async (req, res) => {
     try {
-        const userId = req.headers['user-id']; // Access userId from headers
+        const userId = req.headers['user-id']; 
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
@@ -708,7 +708,8 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
 
 
 
-router.get('/getCompetitors', async (req, res) => {
+// Retailer Competitors Route
+router.get('/retailer/competitors', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
@@ -716,22 +717,39 @@ router.get('/getCompetitors', async (req, res) => {
         }
 
         const user = await User.findById(userId);
-        if (!user) {
-            return res.status(400).json({ error: "Unable to find user" });
-        } else if (user.userType === "Retailer") {
-            const competitorsCategory = retailerFlags.carousel.find(category => category["COMPETITORS"]);
-            return res.json(competitorsCategory ? competitorsCategory["COMPETITORS"] : []);
-        } else if (user.userType === "Supplier") {
-            const competitorsSupplierCategory = supplierFlags.carousel.find(category => category["COMPETITORS"]);
-            return res.json(competitorsSupplierCategory ? competitorsSupplierCategory["COMPETITORS"] : []);
-        } else {
+        if (!user || user.userType !== "Retailer") {
             return res.status(403).json({ error: "Access denied" });
         }
+
+        const competitorsCategory = retailerFlags.carousel.find(category => category["COMPETITORS"]);
+        return res.json(competitorsCategory ? competitorsCategory["COMPETITORS"] : []);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Unable to find competitors" });
+        return res.status(500).json({ error: "Unable to find competitors for retailers" });
     }
 });
+
+// Supplier Competitors Route
+router.get('/supplier/competitors', async (req, res) => {
+    try {
+        const userId = req.headers['user-id'];
+        if (!userId) {
+            return res.status(400).json({ error: "userId is required" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user || user.userType !== "Supplier") {
+            return res.status(403).json({ error: "Access denied" });
+        }
+
+        const competitorsSupplierCategory = supplierFlags.carousel.find(category => category["COMPETITORS"]);
+        return res.json(competitorsSupplierCategory ? competitorsSupplierCategory["COMPETITORS"] : []);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Unable to find competitors for suppliers" });
+    }
+});
+
 
 
 //get competitors of the same industry
