@@ -611,6 +611,29 @@ router.get('/getAllHotPickedRetailers', async (req, res) => {
     }
 });
 
+
+router.get('/getAllLastChanceRetailers', async (req, res) => {
+    try {
+        const userId = req.query.userId;
+         if(!userId){
+            return res.status(400).json({ error: "userId is required" });
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(400).json({ error: "Unable to find user" });
+        } else if (user.userType === "Retailer") {
+            const lastChanceCategory = retailerFlags.carousel.find(category => category["LAST CHANCE"]);
+            return res.json(lastChanceCategory ? lastChanceCategory["LAST CHANCE"] : []);
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Unable to find last Chance retailers" });
+    }
+});
+
+
 router.get('/getAllLowInStockSuppliers', async (req, res) => {
     try {
         const userId = req.query.userId;
