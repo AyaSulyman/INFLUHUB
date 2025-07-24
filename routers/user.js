@@ -128,7 +128,7 @@ router.post('/resend-otp', async (req, res) => {
         const otp = crypto.randomInt(100000, 999999).toString();
         otps[Email] = { otp, expires: Date.now() + 300000 };
 
-       
+
         await sendOtpEmail(Email, otp);
 
         res.status(200).json({ message: 'OTP has been resent to your email' });
@@ -539,7 +539,7 @@ const getSuppliersByIndustry = (industry) => {
 
 // Retailer Dashboard Section
 const supplierFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/SupplierFlags64.json'), 'utf-8'));
-const retailerFlags=JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/RetailerFlags64.json'), 'utf-8'));
+const retailerFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/RetailerFlags64.json'), 'utf-8'));
 
 router.post('/home-dashboard', async (req, res) => {
     try {
@@ -550,13 +550,28 @@ router.post('/home-dashboard', async (req, res) => {
         const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({ error: "Unable to find user" });
-        } else if (user.userType === "Supplier") {
-            return res.json(supplierFlags.carousel.slice(0, 9)); 
+        }
+
+        let response = {};
+
+        if (user.userType === "Supplier") {
+            response = {
+                featured: supplierFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
+                lowInStock: supplierFlags.carousel.find(category => category[" LOW IN STOCK"])?.[" LOW IN STOCK"].slice(0, 10) || [],
+                competitors: supplierFlags.carousel.find(category => category.COMPETITORS)?.COMPETITORS.slice(0, 10) || []
+            };
         } else if (user.userType === "Retailer") {
-            return res.json(retailerFlags.carousel.slice(0, 9)); 
+            response = {
+                featured: retailerFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
+                hotPicks: retailerFlags.carousel.find(category => category["HOT PICKS"])?.["HOT PICKS"].slice(0, 10) || [],
+                lastChance: retailerFlags.carousel.find(category => category["LAST CHANCE"])?.["LAST CHANCE"].slice(0, 10) || [],
+                competitors: retailerFlags.carousel.find(category => category.COMPETITORS)?.COMPETITORS.slice(0, 10) || []
+            };
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
+
+        return res.json(response);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal server error" });
@@ -564,9 +579,10 @@ router.post('/home-dashboard', async (req, res) => {
 });
 
 
+
 router.get('/getAllFeatured', async (req, res) => {
     try {
-        const userId = req.headers['user-id']; 
+        const userId = req.headers['user-id'];
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
@@ -592,7 +608,7 @@ router.get('/getAllFeatured', async (req, res) => {
 
 router.get('/getAllHotPickedRetailers', async (req, res) => {
     try {
-        const userId = req.headers['user-id']; 
+        const userId = req.headers['user-id'];
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
@@ -614,7 +630,7 @@ router.get('/getAllHotPickedRetailers', async (req, res) => {
 
 router.get('/getAllLastChanceRetailers', async (req, res) => {
     try {
-        const userId = req.headers['user-id']; 
+        const userId = req.headers['user-id'];
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
@@ -662,7 +678,7 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
 
 router.get('/getCompetitors', async (req, res) => {
     try {
-        const userId = req.headers['user-id']; 
+        const userId = req.headers['user-id'];
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
@@ -705,17 +721,17 @@ const getCompetitorsBySameIndustry = async (industry, _id, userType) => {
 // Endpoint for Retailers
 router.post('/get-same-industry-retailers', async (req, res) => {
     try {
-        const userId = req.headers['user-id']; 
+        const userId = req.headers['user-id'];
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
 
-        const currentUser  = await User.findById(userId);
-        if (!currentUser  || currentUser .userType !== "Retailer") {
+        const currentUser = await User.findById(userId);
+        if (!currentUser || currentUser.userType !== "Retailer") {
             return res.status(403).json({ error: "Access denied" });
         }
 
-        const matchingRetailers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Retailer");
+        const matchingRetailers = await getCompetitorsBySameIndustry(currentUser.Industry, currentUser._id, "Retailer");
         res.status(200).json(matchingRetailers);
     } catch (error) {
         console.error(error);
@@ -731,12 +747,12 @@ router.post('/get-same-industry-suppliers', async (req, res) => {
             return res.status(400).json({ error: "userId is required" });
         }
 
-        const currentUser  = await User.findById(userId);
-        if (!currentUser  || currentUser .userType !== "Supplier") {
+        const currentUser = await User.findById(userId);
+        if (!currentUser || currentUser.userType !== "Supplier") {
             return res.status(403).json({ error: "Access denied" });
         }
 
-        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Supplier");
+        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser.Industry, currentUser._id, "Supplier");
         res.status(200).json(matchingSuppliers);
     } catch (error) {
         console.error(error);
