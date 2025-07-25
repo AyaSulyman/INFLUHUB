@@ -541,7 +541,6 @@ const supplierFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json f
 const retailerFlags = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/RetailerFlags64.json'), 'utf-8'));
 
 // Retailer Dashboard Route
-// Retailer Dashboard Route
 router.post('/retailer/dashboard', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
@@ -710,50 +709,6 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
 
 
 
-// Retailer Competitors Route
-router.get('/retailer/competitors', async (req, res) => {
-    try {
-        const userId = req.headers['user-id'];
-        if (!userId) {
-            return res.status(400).json({ error: "userId is required" });
-        }
-
-        const user = await User.findById(userId);
-        if (!user || user.userType !== "Retailer") {
-            return res.status(403).json({ error: "Access denied" });
-        }
-
-        const competitorsCategory = retailerFlags.carousel.find(category => category["COMPETITORS"]);
-        return res.json(competitorsCategory ? competitorsCategory["COMPETITORS"] : []);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Unable to find competitors for retailers" });
-    }
-});
-
-// Supplier Competitors Route
-router.get('/supplier/competitors', async (req, res) => {
-    try {
-        const userId = req.headers['user-id'];
-        if (!userId) {
-            return res.status(400).json({ error: "userId is required" });
-        }
-
-        const user = await User.findById(userId);
-        if (!user || user.userType !== "Supplier") {
-            return res.status(403).json({ error: "Access denied" });
-        }
-
-        const competitorsSupplierCategory = supplierFlags.carousel.find(category => category["COMPETITORS"]);
-        return res.json(competitorsSupplierCategory ? competitorsSupplierCategory["COMPETITORS"] : []);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Unable to find competitors for suppliers" });
-    }
-});
-
-
-
 //get competitors of the same industry
 const getCompetitorsBySameIndustry = async (industry, _id, userType) => {
     if (!industry) return [];
@@ -771,7 +726,7 @@ const getCompetitorsBySameIndustry = async (industry, _id, userType) => {
 };
 
 // Endpoint for Retailers
-router.post('/get-same-industry-retailers', async (req, res) => {
+router.post('/retailer/competitors', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
@@ -792,7 +747,7 @@ router.post('/get-same-industry-retailers', async (req, res) => {
 });
 
 // Endpoint for Suppliers
-router.post('/get-same-industry-suppliers', async (req, res) => {
+router.post('/supplier/competitors', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
