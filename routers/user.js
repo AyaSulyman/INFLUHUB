@@ -725,26 +725,37 @@ const getCompetitorsBySameIndustry = async (industry, _id, userType) => {
     }
 };
 
-// Endpoint for Retailers
-router.post('/retailer/competitors', async (req, res) => {
-    try {
-        const userId = req.headers['user-id'];
-        if (!userId) {
-            return res.status(400).json({ error: "userId is required" });
-        }
 
-        const currentUser = await User.findById(userId);
-        if (!currentUser || currentUser.userType !== "Retailer") {
-            return res.status(403).json({ error: "Access denied" });
-        }
+   // Endpoint for Retailers
+   router.post('/retailer/competitors', async (req, res) => {
+       try {
+           const userId = req.headers['user-id'];
+           if (!userId) {
+               return res.status(400).json({ error: "userId is required" });
+           }
 
-        const matchingRetailers = await getCompetitorsBySameIndustry(currentUser.Industry, currentUser._id, "Retailer");
-        res.status(200).json(matchingRetailers);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server error" });
-    }
-});
+           const currentUser  = await User.findById(userId);
+           if (!currentUser  || currentUser .userType !== "Retailer") {
+               return res.status(403).json({ error: "Access denied" });
+           }
+
+           const matchingRetailers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Retailer");
+
+           
+           const response = matchingRetailers.map(retailer => ({
+               id: retailer._id,
+               name: retailer.username, 
+               image: retailer.image || 'D.png' 
+           }));
+
+           res.status(200).json(response);
+       } catch (error) {
+           console.error(error);
+           res.status(500).json({ error: "Server error" });
+       }
+   });
+   
+
 
 // Endpoint for Suppliers
 router.post('/supplier/competitors', async (req, res) => {
@@ -754,13 +765,20 @@ router.post('/supplier/competitors', async (req, res) => {
             return res.status(400).json({ error: "userId is required" });
         }
 
-        const currentUser = await User.findById(userId);
-        if (!currentUser || currentUser.userType !== "Supplier") {
+        const currentUser  = await User.findById(userId);
+        if (!currentUser  || currentUser .userType !== "Supplier") {
             return res.status(403).json({ error: "Access denied" });
         }
 
-        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser.Industry, currentUser._id, "Supplier");
-        res.status(200).json(matchingSuppliers);
+        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Supplier");
+
+        const response = matchingSuppliers.map(supplier => ({
+            id: supplier._id,
+            name: supplier.username,
+            image: supplier.image || 'D.png' 
+        }));
+
+        res.status(200).json(response);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
