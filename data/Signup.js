@@ -68,6 +68,7 @@ const UserSchema = new mongoose.Schema({
         enum: ['Influencer', 'Business Owner'],
         require: true
     },
+    
     Industry: {
         type: String,
         require: function(){
