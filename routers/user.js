@@ -553,6 +553,7 @@ router.post('/retailer/dashboard', async (req, res) => {
             return res.status(403).json({ error: "Access denied" });
         }
 
+        
         const response = {
             featured: retailerFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
             hotPicks: retailerFlags.carousel.find(category => category["HOT PICKS"])?.["HOT PICKS"].slice(0, 10) || [],
@@ -560,7 +561,8 @@ router.post('/retailer/dashboard', async (req, res) => {
             competitors: retailerFlags.carousel.find(category => category.COMPETITORS)?.COMPETITORS.slice(0, 10) || []
         };
 
-        return res.json(response);
+        return res.status(200).json(response);
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal server error" });
@@ -586,7 +588,8 @@ router.post('/supplier/dashboard', async (req, res) => {
             competitors: supplierFlags.carousel.find(category => category.COMPETITORS)?.COMPETITORS.slice(0, 10) || []
         };
 
-        return res.json(response);
+        return res.status(200).json(response);
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal server error" });
@@ -609,7 +612,7 @@ router.get('/retailer/featured', async (req, res) => {
         }
 
         const featuredRetailerCategory = retailerFlags.carousel.find(category => category.FEATURED);
-        return res.json(featuredRetailerCategory ? featuredRetailerCategory.FEATURED : []);
+        return res.status(200).json(featuredRetailerCategory ? featuredRetailerCategory.FEATURED : []);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Unable to find featured retailers" });
@@ -629,7 +632,7 @@ router.get('/supplier/featured', async (req, res) => {
         }
 
         const featuredCategory = supplierFlags.carousel.find(category => category.FEATURED);
-        return res.json(featuredCategory ? featuredCategory.FEATURED : []);
+        return res.status(200).json(featuredCategory ? featuredCategory.FEATURED : []);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Unable to find featured suppliers" });
@@ -650,7 +653,7 @@ router.get('/getAllHotPickedRetailers', async (req, res) => {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Retailer") {
             const hotPicksCategory = retailerFlags.carousel.find(category => category["HOT PICKS"]);
-            return res.json(hotPicksCategory ? hotPicksCategory["HOT PICKS"] : []);
+            return res.status(200).json(hotPicksCategory ? hotPicksCategory["HOT PICKS"] : []);
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
@@ -672,7 +675,7 @@ router.get('/getAllLastChanceRetailers', async (req, res) => {
             return res.status(400).json({ error: "Unable to find user" });
         } else if (user.userType === "Retailer") {
             const lastChanceCategory = retailerFlags.carousel.find(category => category["LAST CHANCE"]);
-            return res.json(lastChanceCategory ? lastChanceCategory["LAST CHANCE"] : []);
+            return res.status(200).json(lastChanceCategory ? lastChanceCategory["LAST CHANCE"] : []);
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
@@ -697,7 +700,7 @@ router.get('/getAllLowInStockSuppliers', async (req, res) => {
             console.log('Supplier Flags:', supplierFlags);
             const lowInStockCategory = supplierFlags.carousel.find(category => category[" LOW IN STOCK"]);
             console.log('Low In Stock Category:', lowInStockCategory);
-            return res.json(lowInStockCategory ? lowInStockCategory[" LOW IN STOCK"] : []);
+            return res.status(200).json(lowInStockCategory ? lowInStockCategory[" LOW IN STOCK"] : []);
         } else {
             return res.status(403).json({ error: "Access denied" });
         }
