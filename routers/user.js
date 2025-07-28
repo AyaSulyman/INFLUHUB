@@ -336,22 +336,20 @@ router.get('/profile-onboarding-submit/:_id', async (req, res) => {
 
 
 router.get('/profile-onboarding', async (req, res) => {
-  try {
-    // ✅ Ensure industries.carousel exists
-    const industriesWithSuppliers = industries.carousel?.map(industry => ({
-      ...industry,
-      Suppliers: getSuppliersByIndustry(industry.industry)
-    })) || [];
-
-    res.status(200).json({
-      industries: industriesWithSuppliers,
-      degrees: degree,
-      capitals: capital
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to load onboarding options" });
-  }
+    try {
+        const industriesWithSuppliers = industries.carousel.map(industry => {
+            const suppliers = getSuppliersByIndustry(industry.industry);
+            return { ...industry, Suppliers: suppliers };
+        });
+        res.status(200).json({
+            industries: industriesWithSuppliers,
+            degrees: degree,
+            capitals: capital
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to load onboarding options" });
+    }
 });
 
 
