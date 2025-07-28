@@ -22,6 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^4.15.0",
     "mongoose": "^8.16.0",
+    "multer": "^2.0.2",
     "nodemailer": "^7.0.3",
     "openssl": "^2.0.0",
     "path": "^0.12.7",
