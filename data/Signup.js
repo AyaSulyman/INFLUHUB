@@ -63,12 +63,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    WorkType: {
-        type: String,
-        enum: ['Influencer', 'Business Owner'],
-        require: true
-    },
-
+ 
     Industry: {
         type: String,
         require: function () {
@@ -109,7 +104,6 @@ const UserSchema = new mongoose.Schema({
     },
     image: {
         type: String, 
-        required: true,
          require: function () {
             return this.userType === "Supplier" || this.userType === "Retailer"
         }
