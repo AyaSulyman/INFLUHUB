@@ -285,13 +285,13 @@ router.post(
       user.userType = userType;
       user.image = base64Image;
 
-      // Reset optional fields so that irrelevant ones are removed
-      user.Industry = undefined;
-      user.Degree = undefined;
-      user.isFreelancer = undefined;
-      user.Type = undefined;
-      user.Capital = undefined;
-      user.DigitalPresence = undefined;
+    //   // Reset optional fields so that irrelevant ones are removed
+    //   user.Industry = undefined;
+    //   user.Degree = undefined;
+    //   user.isFreelancer = undefined;
+    //   user.Type = undefined;
+    //   user.Capital = undefined;
+    //   user.DigitalPresence = undefined;
 
       if (userType === "Retailer") {
         if (!Industry || !Degree || typeof isFreelancer === "undefined") {
