@@ -240,7 +240,7 @@ const degree = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/De
 
 const multer = require("multer");
 
-const storage = multer.memoryStorage();
+const storage = multer.memoryStorage(); 
 const upload = multer({ storage });
 
 router.post(
@@ -262,12 +262,11 @@ router.post(
         DigitalPresence,
       } = req.body;
 
-      // ✅ Validate required common fields
+      // Validate required fields
       if (!email || !CountryCode || !PhoneNumber || !userType) {
         return res.status(400).json({ error: "All required fields must be filled." });
       }
 
-      // ✅ Validate that an image file is uploaded
       if (!req.file) {
         return res.status(400).json({ error: "Image file is required." });
       }
@@ -280,66 +279,50 @@ router.post(
 
       const username = requestedUsername || email.split("@")[0];
 
-      // ✅ Update common fields
+      // Update common fields
       user.username = username;
       user.CountryCode = CountryCode;
       user.PhoneNumber = PhoneNumber;
       user.userType = userType;
       user.image = base64Image;
 
-      // ✅ Reset irrelevant fields so old data doesn't stay in DB
-      user.Industry = undefined;
-      user.Degree = undefined;
-      user.isFreelancer = undefined;
-      user.Type = undefined;
-      user.Capital = undefined;
-      user.DigitalPresence = undefined;
-
-      // ✅ Handle Retailer fields
       if (userType === "Retailer") {
         if (!Industry || !Degree || typeof isFreelancer === "undefined") {
           return res.status(400).json({ message: "All Retailer fields are required" });
         }
+
+        // Save only Retailer fields
         user.Industry = Industry;
         user.Degree = Degree;
         user.isFreelancer = isFreelancer;
-      } 
-      // ✅ Handle Supplier fields
-      else if (userType === "Supplier") {
+
+        // Remove supplier-specific fields
+        user.Type = undefined;
+        user.Capital = undefined;
+        user.DigitalPresence = undefined;
+
+      } else if (userType === "Supplier") {
         if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
           return res.status(400).json({ message: "All Supplier fields are required" });
         }
+
+        // Save only Supplier fields
         user.Industry = Industry;
         user.Type = Type;
         user.Capital = Capital;
         user.DigitalPresence = DigitalPresence;
-      } 
-      else {
+
+        // Remove retailer-specific fields
+        user.Degree = undefined;
+        user.isFreelancer = undefined;
+
+      } else {
         return res.status(400).json({ message: "Invalid userType" });
       }
 
-      // ✅ Save to database
       await user.save();
+      res.status(200).json({ message: "Profile updated", data: user });
 
-      // ✅ Send response with only relevant fields
-      res.status(200).json({
-        message: "Profile updated successfully",
-        data: {
-          username: user.username,
-          userType: user.userType,
-          ...(userType === "Retailer" && {
-            Industry: user.Industry,
-            Degree: user.Degree,
-            isFreelancer: user.isFreelancer
-          }),
-          ...(userType === "Supplier" && {
-            Industry: user.Industry,
-            Type: user.Type,
-            Capital: user.Capital,
-            DigitalPresence: user.DigitalPresence
-          }),
-        },
-      });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
@@ -537,7 +520,7 @@ router.post('/retailer/dashboard', async (req, res) => {
             return res.status(403).json({ error: "Access denied" });
         }
 
-
+        
         const response = {
             featured: retailerFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
             hotPicks: retailerFlags.carousel.find(category => category["HOT PICKS"])?.["HOT PICKS"].slice(0, 10) || [],
@@ -672,7 +655,7 @@ router.get('/getAllLastChanceSuppliers', async (req, res) => {
 
 router.get('/getAllLowInStockSuppliers', async (req, res) => {
     try {
-        const userId = req.headers['user-id'];
+        const userId = req.headers['user-id']; 
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
@@ -713,35 +696,35 @@ const getCompetitorsBySameIndustry = async (industry, _id, userType) => {
 };
 
 
-// Endpoint for Retailers
-router.post('/retailer/competitors', async (req, res) => {
-    try {
-        const userId = req.headers['user-id'];
-        if (!userId) {
-            return res.status(400).json({ error: "userId is required" });
-        }
+   // Endpoint for Retailers
+   router.post('/retailer/competitors', async (req, res) => {
+       try {
+           const userId = req.headers['user-id'];
+           if (!userId) {
+               return res.status(400).json({ error: "userId is required" });
+           }
 
-        const currentUser = await User.findById(userId);
-        if (!currentUser || currentUser.userType !== "Retailer") {
-            return res.status(403).json({ error: "Access denied" });
-        }
+           const currentUser  = await User.findById(userId);
+           if (!currentUser  || currentUser .userType !== "Retailer") {
+               return res.status(403).json({ error: "Access denied" });
+           }
 
-        const matchingRetailers = await getCompetitorsBySameIndustry(currentUser.Industry, currentUser._id, "Retailer");
+           const matchingRetailers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Retailer");
 
+           
+           const response = matchingRetailers.map(retailer => ({
+               id: retailer._id,
+               name: retailer.username, 
+               image: retailer.image || 'D.png' 
+           }));
 
-        const response = matchingRetailers.map(retailer => ({
-            id: retailer._id,
-            name: retailer.username,
-            image: retailer.image || 'D.png'
-        }));
-
-        res.status(200).json(response);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server error" });
-    }
-});
-
+           res.status(200).json(response);
+       } catch (error) {
+           console.error(error);
+           res.status(500).json({ error: "Server error" });
+       }
+   });
+   
 
 
 // Endpoint for Suppliers
@@ -752,17 +735,17 @@ router.post('/supplier/competitors', async (req, res) => {
             return res.status(400).json({ error: "userId is required" });
         }
 
-        const currentUser = await User.findById(userId);
-        if (!currentUser || currentUser.userType !== "Supplier") {
+        const currentUser  = await User.findById(userId);
+        if (!currentUser  || currentUser .userType !== "Supplier") {
             return res.status(403).json({ error: "Access denied" });
         }
 
-        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser.Industry, currentUser._id, "Supplier");
+        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Supplier");
 
         const response = matchingSuppliers.map(supplier => ({
             id: supplier._id,
             name: supplier.username,
-            image: supplier.image || 'D.png'
+            image: supplier.image || 'D.png' 
         }));
 
         res.status(200).json(response);
