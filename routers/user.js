@@ -233,16 +233,6 @@ router.post('/login', async (req, res) => {
 
 //Profile-Onboarding
 
-// Load JSON files
-const industries = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/industries_base64.json'), 'utf-8'));
-const capital = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Capitals.json'), 'utf-8'));
-const degree = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Degrees.json'), 'utf-8'));
-
-const multer = require("multer");
-
-const storage = multer.memoryStorage(); 
-const upload = multer({ storage });
-
 router.post(
   "/profile-onboarding-submit",
   upload.single("image"),
@@ -262,7 +252,6 @@ router.post(
         DigitalPresence,
       } = req.body;
 
-      // Validate required fields
       if (!email || !CountryCode || !PhoneNumber || !userType) {
         return res.status(400).json({ error: "All required fields must be filled." });
       }
@@ -275,7 +264,7 @@ router.post(
       const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
 
       const user = await User.findOne({ Email: email });
-      if (!user) return res.status(404).json({ error: "User  not found" });
+      if (!user) return res.status(404).json({ error: "User not found" });
 
       const username = requestedUsername || email.split("@")[0];
 
@@ -286,7 +275,14 @@ router.post(
       user.userType = userType;
       user.image = base64Image;
 
-      // Handle Retailer specific fields
+      // Reset optional fields so that irrelevant ones are removed
+      user.Industry = undefined;
+      user.Degree = undefined;
+      user.isFreelancer = undefined;
+      user.Type = undefined;
+      user.Capital = undefined;
+      user.DigitalPresence = undefined;
+
       if (userType === "Retailer") {
         if (!Industry || !Degree || typeof isFreelancer === "undefined") {
           return res.status(400).json({ message: "All Retailer fields are required" });
@@ -295,23 +291,19 @@ router.post(
         user.Degree = Degree;
         user.isFreelancer = isFreelancer;
       } 
-      // Handle Supplier specific fields
       else if (userType === "Supplier") {
         if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
           return res.status(400).json({ message: "All Supplier fields are required" });
         }
-        // Only save Supplier specific fields
-        user.Industry = Industry; // You can keep this if you want to save Industry for Suppliers
+        user.Industry = Industry;
         user.Type = Type;
         user.Capital = Capital;
         user.DigitalPresence = DigitalPresence;
       } 
-      // Handle invalid userType
       else {
         return res.status(400).json({ message: "Invalid userType" });
       }
 
-      // Save the user object
       await user.save();
       res.status(200).json({ message: "Profile updated", data: user });
     } catch (err) {
@@ -320,6 +312,7 @@ router.post(
     }
   }
 );
+
 
 router.post('/check-username', async (req, res) => {
     const { username } = req.body;
