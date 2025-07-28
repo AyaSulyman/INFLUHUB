@@ -56,7 +56,7 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         require: true,
         trim: true,
-       
+
 
     },
     userType: {
@@ -68,45 +68,54 @@ const UserSchema = new mongoose.Schema({
         enum: ['Influencer', 'Business Owner'],
         require: true
     },
-    
+
     Industry: {
         type: String,
-        require: function(){
+        require: function () {
             return this.userType === "Supplier" || this.userType === "Retailer"
         }
     },
     Degree: {
         type: String,
-        require: function(){
-        return this.userType === "Retailer"    
+        require: function () {
+            return this.userType === "Retailer"
         }
     },
-   
+
     Type: {
         type: String,
-        require: function(){
-        return this.userType === "Supplier"      
+        require: function () {
+            return this.userType === "Supplier"
         }
     },
-   
+
     Capital: {
         type: String,
-        require:  function(){
+        require: function () {
             return this.userType === "Supplier"
         }
     },
     DigitalPresence: {
         type: String,
-        require: function() {
+        require: function () {
             return this.userType === 'Supplier';
         }
     },
     isFreelancer: {
         type: String,
-        require: function() {
+        require: function () {
             return this.userType === 'Retailer';
         }
+    },
+    image: {
+        type: String, 
+        required: true,
+         require: function () {
+            return this.userType === "Supplier" || this.userType === "Retailer"
+        }
     }
+
+
 
 }, {
     timestamps: true
