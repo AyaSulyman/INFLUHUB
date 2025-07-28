@@ -233,6 +233,11 @@ router.post('/login', async (req, res) => {
 
 //Profile-Onboarding
 
+// Load JSON files
+const industries = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/industries_base64.json'), 'utf-8'));
+const capital = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Capitals.json'), 'utf-8'));
+const degree = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Degrees.json'), 'utf-8'));
+
 const multer = require("multer");
 
 const storage = multer.memoryStorage(); 
@@ -325,23 +330,18 @@ router.post('/check-username', async (req, res) => {
     return res.status(200).json({ message: "Username is available" });
 });
 
-   router.get('/profile-onboarding', async (req, res) => {
-       try {
-           const industriesWithSuppliers = industries.carousel.map(industry => {
-               const suppliers = getSuppliersByIndustry(industry.industry);
-               return { ...industry, Suppliers: suppliers };
-           });
-           res.status(200).json({
-               industries: industriesWithSuppliers,
-               degrees: degree,
-               capitals: capital
-           });
-       } catch (error) {
-           console.error(error);
-           res.status(500).json({ error: "Failed to load onboarding options" });
-       }
-   });
-   
+router.get('/profile-onboarding-submit', async (req, res) => {
+    try {
+        const data = await User.find({});
+        if (data.length === 0) {
+            return res.status(200).json([]);
+        }
+        res.status(200).send(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+});
 
 
 router.get('/profile-onboarding-submit/:_id', async (req, res) => {
