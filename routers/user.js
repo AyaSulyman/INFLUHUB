@@ -265,22 +265,21 @@ router.post(
         return res.status(400).json({ error: "Image file is required." });
       }
 
+    
       const mimeType = req.file.mimetype;
       const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
 
       const user = await User.findOne({ Email: email });
-      if (!user) return res.status(404).json({ error: "User  not found" });
+      if (!user) return res.status(404).json({ error: "User not found" });
 
       const username = requestedUsername || email.split("@")[0];
 
-      // Update common fields
       user.username = username;
       user.CountryCode = CountryCode;
       user.PhoneNumber = PhoneNumber;
       user.userType = userType;
-      user.image = base64Image; // Save the base64 image
+      user.image = base64Image;
 
-      // Handle userType specific fields
       if (userType === "Retailer") {
         if (!Industry || !Degree || typeof isFreelancer === "undefined") {
           return res.status(400).json({ message: "All Retailer fields are required" });
@@ -288,11 +287,6 @@ router.post(
         user.Industry = Industry;
         user.Degree = Degree;
         user.isFreelancer = isFreelancer;
-
-        // Clear Supplier-specific fields
-        user.Type = undefined;
-        user.Capital = undefined;
-        user.DigitalPresence = undefined;
       } else if (userType === "Supplier") {
         if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
           return res.status(400).json({ message: "All Supplier fields are required" });
@@ -301,10 +295,7 @@ router.post(
         user.Type = Type;
         user.Capital = Capital;
         user.DigitalPresence = DigitalPresence;
-
-        // Clear Retailer-specific fields
-        user.Degree = undefined;
-        user.isFreelancer = undefined;
+        
       } else {
         return res.status(400).json({ message: "Invalid userType" });
       }
@@ -317,6 +308,35 @@ router.post(
     }
   }
 );
+
+
+router.post('/check-username', async (req, res) => {
+    const { username } = req.body;
+
+    if (!username) {
+        return res.status(400).json({ message: "Username is required" });
+    }
+
+    const user = await User.findOne({ username });
+    if (user) {
+        return res.status(400).json({ message: "Username already exists" });
+    }
+
+    return res.status(200).json({ message: "Username is available" });
+});
+
+router.get('/profile-onboarding-submit', async (req, res) => {
+    try {
+        const data = await User.find({});
+        if (data.length === 0) {
+            return res.status(200).json([]);
+        }
+        res.status(200).send(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "An error occurred while fetching data" });
+    }
+});
 
 
 router.get('/profile-onboarding-submit/:_id', async (req, res) => {
