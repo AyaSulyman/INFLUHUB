@@ -262,10 +262,12 @@ router.post(
         DigitalPresence,
       } = req.body;
 
+      // ✅ Validate required common fields
       if (!email || !CountryCode || !PhoneNumber || !userType) {
         return res.status(400).json({ error: "All required fields must be filled." });
       }
 
+      // ✅ Validate that an image file is uploaded
       if (!req.file) {
         return res.status(400).json({ error: "Image file is required." });
       }
@@ -278,14 +280,14 @@ router.post(
 
       const username = requestedUsername || email.split("@")[0];
 
-      // Update common fields
+      // ✅ Update common fields
       user.username = username;
       user.CountryCode = CountryCode;
       user.PhoneNumber = PhoneNumber;
       user.userType = userType;
       user.image = base64Image;
 
-      // Reset irrelevant fields
+      // ✅ Reset irrelevant fields so old data doesn't stay in DB
       user.Industry = undefined;
       user.Degree = undefined;
       user.isFreelancer = undefined;
@@ -293,6 +295,7 @@ router.post(
       user.Capital = undefined;
       user.DigitalPresence = undefined;
 
+      // ✅ Handle Retailer fields
       if (userType === "Retailer") {
         if (!Industry || !Degree || typeof isFreelancer === "undefined") {
           return res.status(400).json({ message: "All Retailer fields are required" });
@@ -301,6 +304,7 @@ router.post(
         user.Degree = Degree;
         user.isFreelancer = isFreelancer;
       } 
+      // ✅ Handle Supplier fields
       else if (userType === "Supplier") {
         if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
           return res.status(400).json({ message: "All Supplier fields are required" });
@@ -314,8 +318,10 @@ router.post(
         return res.status(400).json({ message: "Invalid userType" });
       }
 
-      await user.save(); // ✅ Make sure user is saved before responding
+      // ✅ Save to database
+      await user.save();
 
+      // ✅ Send response with only relevant fields
       res.status(200).json({
         message: "Profile updated successfully",
         data: {
