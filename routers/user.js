@@ -600,7 +600,7 @@ router.post('/supplier/dashboard', async (req, res) => {
 
 
 // Retailer Featured Route
-router.get('/retailer/featured', async (req, res) => {
+router.get('/retailer/featured-suppliers', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
@@ -620,7 +620,7 @@ router.get('/retailer/featured', async (req, res) => {
 });
 
 // Supplier Featured Route
-router.get('/supplier/featured', async (req, res) => {
+router.get('/supplier/featured-suppliers', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
@@ -642,7 +642,7 @@ router.get('/supplier/featured', async (req, res) => {
 
 
 
-router.get('/getAllHotPickedRetailers', async (req, res) => {
+router.get('/getAllHotPickedSuppliers', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
@@ -664,7 +664,7 @@ router.get('/getAllHotPickedRetailers', async (req, res) => {
 });
 
 
-router.get('/getAllLastChanceRetailers', async (req, res) => {
+router.get('/getAllLastChanceSuppliers', async (req, res) => {
     try {
         const userId = req.headers['user-id'];
         if (!userId) {
