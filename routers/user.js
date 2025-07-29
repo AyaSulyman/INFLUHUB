@@ -240,94 +240,99 @@ const degree = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/De
 
 const multer = require("multer");
 
-const storage = multer.memoryStorage(); 
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.post(
-  "/profile-onboarding-submit",
-  upload.single("image"),
-  async (req, res) => {
-    try {
-      const {
-        email,
-        username: requestedUsername,
-        CountryCode,
-        PhoneNumber,
-        userType,
-        Industry,
-        Degree,
-        isFreelancer,
-        Type,
-        Capital,
-        DigitalPresence,
-      } = req.body;
+    "/profile-onboarding-submit",
+    upload.single("image"),
+    async (req, res) => {
+        try {
+            const {
+                email,
+                username: requestedUsername,
+                CountryCode,
+                PhoneNumber,
+                userType,
+                Industry,
+                Degree,
+                isFreelancer,
+                Type,
+                Capital,
+                DigitalPresence,
+            } = req.body;
 
-      // Validate required fields
-      if (!email || !CountryCode || !PhoneNumber || !userType) {
-        return res.status(400).json({ error: "All required fields must be filled." });
-      }
 
-      if (!req.file) {
-        return res.status(400).json({ error: "Image file is required." });
-      }
+            if (!email || !CountryCode || !PhoneNumber || !userType) {
+                return res.status(400).json({ error: "All required fields must be filled." });
+            }
 
-      const mimeType = req.file.mimetype;
-      const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
 
-      const user = await User.findOne({ Email: email });
-      if (!user) return res.status(404).json({ error: "User not found" });
+            if (!req.file) {
+                return res.status(400).json({ error: "Image file is required." });
+            }
 
-      const username = requestedUsername || email.split("@")[0];
+            const mimeType = req.file.mimetype;
+            const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
 
-      // Update common fields
-      user.username = username;
-      user.CountryCode = CountryCode;
-      user.PhoneNumber = PhoneNumber;
-      user.userType = userType;
-      user.image = base64Image;
+            const user = await User.findOne({ Email: email });
+            if (!user) return res.status(404).json({ error: "User not found" });
 
-      if (userType === "Retailer") {
-        if (!Industry || !Degree || typeof isFreelancer === "undefined") {
-          return res.status(400).json({ message: "All Retailer fields are required" });
+            const username = requestedUsername || email.split("@")[0];
+
+
+            user.username = username;
+            user.CountryCode = CountryCode;
+            user.PhoneNumber = PhoneNumber;
+            user.userType = userType;
+            user.image = base64Image;
+
+            if (userType === "Retailer") {
+                if (!Industry || !Degree || typeof isFreelancer === "undefined") {
+                    return res.status(400).json({
+                        message: "All Retailer fields are required: Industry, Degree, and isFreelancer"
+                    });
+                }
+
+                user.Industry = Industry;
+                user.Degree = Degree;
+                user.isFreelancer = isFreelancer;
+
+                // Clear Supplier-specific fields
+                user.Type = undefined;
+                user.Capital = undefined;
+                user.DigitalPresence = undefined;
+
+            } else if (userType === "Supplier") {
+                if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
+                    return res.status(400).json({
+                        message: "All Supplier fields are required: Industry, Type, Capital, and DigitalPresence"
+                    });
+                }
+
+                user.Industry = Industry;
+                user.Type = Type;
+                user.Capital = Capital;
+                user.DigitalPresence = DigitalPresence;
+
+                // Clear Retailer-specific fields
+                user.Degree = undefined;
+                user.isFreelancer = undefined;
+
+            } else {
+                return res.status(400).json({
+                    message: "Invalid userType. Must be either 'Retailer' or 'Supplier'"
+                });
+            }
+
+            await user.save();
+            res.status(200).json({ message: "Profile updated", data: user });
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: err.message });
         }
-
-        // Save only Retailer fields
-        user.Industry = Industry;
-        user.Degree = Degree;
-        user.isFreelancer = isFreelancer;
-
-        // Remove supplier-specific fields
-        user.Type = undefined;
-        user.Capital = undefined;
-        user.DigitalPresence = undefined;
-
-      } else if (userType === "Supplier") {
-        if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
-          return res.status(400).json({ message: "All Supplier fields are required" });
-        }
-
-        // Save only Supplier fields
-        user.Industry = Industry;
-        user.Type = Type;
-        user.Capital = Capital;
-        user.DigitalPresence = DigitalPresence;
-
-        // Remove retailer-specific fields
-        user.Degree = undefined;
-        user.isFreelancer = undefined;
-
-      } else {
-        return res.status(400).json({ message: "Invalid userType" });
-      }
-
-      await user.save();
-      res.status(200).json({ message: "Profile updated", data: user });
-
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: err.message });
     }
-  }
 );
 
 
@@ -520,7 +525,7 @@ router.post('/retailer/dashboard', async (req, res) => {
             return res.status(403).json({ error: "Access denied" });
         }
 
-        
+
         const response = {
             featured: retailerFlags.carousel.find(category => category.FEATURED)?.FEATURED.slice(0, 10) || [],
             hotPicks: retailerFlags.carousel.find(category => category["HOT PICKS"])?.["HOT PICKS"].slice(0, 10) || [],
@@ -655,7 +660,7 @@ router.get('/getAllLastChanceSuppliers', async (req, res) => {
 
 router.get('/getAllLowInStockSuppliers', async (req, res) => {
     try {
-        const userId = req.headers['user-id']; 
+        const userId = req.headers['user-id'];
         if (!userId) {
             return res.status(400).json({ error: "userId is required" });
         }
@@ -696,35 +701,35 @@ const getCompetitorsBySameIndustry = async (industry, _id, userType) => {
 };
 
 
-   // Endpoint for Retailers
-   router.post('/retailer/competitors', async (req, res) => {
-       try {
-           const userId = req.headers['user-id'];
-           if (!userId) {
-               return res.status(400).json({ error: "userId is required" });
-           }
+// Endpoint for Retailers
+router.post('/retailer/competitors', async (req, res) => {
+    try {
+        const userId = req.headers['user-id'];
+        if (!userId) {
+            return res.status(400).json({ error: "userId is required" });
+        }
 
-           const currentUser  = await User.findById(userId);
-           if (!currentUser  || currentUser .userType !== "Retailer") {
-               return res.status(403).json({ error: "Access denied" });
-           }
+        const currentUser = await User.findById(userId);
+        if (!currentUser || currentUser.userType !== "Retailer") {
+            return res.status(403).json({ error: "Access denied" });
+        }
 
-           const matchingRetailers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Retailer");
+        const matchingRetailers = await getCompetitorsBySameIndustry(currentUser.Industry, currentUser._id, "Retailer");
 
-           
-           const response = matchingRetailers.map(retailer => ({
-               id: retailer._id,
-               name: retailer.username, 
-               image: retailer.image || 'D.png' 
-           }));
 
-           res.status(200).json(response);
-       } catch (error) {
-           console.error(error);
-           res.status(500).json({ error: "Server error" });
-       }
-   });
-   
+        const response = matchingRetailers.map(retailer => ({
+            id: retailer._id,
+            name: retailer.username,
+            image: retailer.image || 'D.png'
+        }));
+
+        res.status(200).json(response);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 
 // Endpoint for Suppliers
@@ -735,17 +740,17 @@ router.post('/supplier/competitors', async (req, res) => {
             return res.status(400).json({ error: "userId is required" });
         }
 
-        const currentUser  = await User.findById(userId);
-        if (!currentUser  || currentUser .userType !== "Supplier") {
+        const currentUser = await User.findById(userId);
+        if (!currentUser || currentUser.userType !== "Supplier") {
             return res.status(403).json({ error: "Access denied" });
         }
 
-        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser .Industry, currentUser ._id, "Supplier");
+        const matchingSuppliers = await getCompetitorsBySameIndustry(currentUser.Industry, currentUser._id, "Supplier");
 
         const response = matchingSuppliers.map(supplier => ({
             id: supplier._id,
             name: supplier.username,
-            image: supplier.image || 'D.png' 
+            image: supplier.image || 'D.png'
         }));
 
         res.status(200).json(response);
