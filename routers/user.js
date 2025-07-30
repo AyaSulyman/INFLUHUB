@@ -298,7 +298,6 @@ router.post(
                 user.Degree = Degree;
                 user.isFreelancer = isFreelancer;
 
-                // Clear Supplier-specific fields
                 user.Type = undefined;
                 user.Capital = undefined;
                 user.DigitalPresence = undefined;
@@ -315,7 +314,7 @@ router.post(
                 user.Capital = Capital;
                 user.DigitalPresence = DigitalPresence;
 
-                // Clear Retailer-specific fields
+                
                 user.Degree = undefined;
                 user.isFreelancer = undefined;
 
