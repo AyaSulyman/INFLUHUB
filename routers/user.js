@@ -375,13 +375,14 @@ const upload = multer({ storage });
 
 router.post("/updating-profile", upload.single("image"), async (req, res) => {
     try {
-        const { email } = req.body;
+        const userId = req.headers['id']; 
 
-    
-        if (!email) {
-            return res.status(400).json({ error: "Email is required." });
+  
+        if (!userId) {
+            return res.status(400).json({ error: "User  ID is required." });
         }
 
+    
         if (!req.file) {
             return res.status(400).json({ error: "Image file is required." });
         }
@@ -389,11 +390,11 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
         const mimeType = req.file.mimetype;
         const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
 
-       
-        const user = await User.findOne({ Email: email });
+   
+        const user = await User.findById(userId); 
         if (!user) return res.status(404).json({ error: "User  not found" });
 
-      
+       
         user.image = base64Image;
 
         
@@ -405,6 +406,9 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+
+
 
 router.post("/profile-onboarding-submit", async (req, res) => {
     try {
