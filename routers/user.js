@@ -239,22 +239,31 @@ const capitalPath = path.join(__dirname, '../json files/Capitals.json');
 const degreePath = path.join(__dirname, '../json files/Degrees.json');
 
 const readJsonFile = (filePath) => {
-    return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-};
-
-
-const writeJsonFile = (filePath, data) => {
     try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-        console.log(`Successfully wrote to ${filePath}`); 
-        return true;
-    } catch (err) {
-        console.error(`Error writing to ${filePath}:`, err);
-        return false;
+        return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    } catch (error) {
+        console.error(`Error reading ${filePath}:`, error);
+        throw new Error("Failed to read JSON file");
     }
 };
 
+const backupJsonFile = (filePath) => {
+    const backupPath = `${filePath}.bak`;
+    fs.copyFileSync(filePath, backupPath);
+    console.log(`Backup created at ${backupPath}`);
+};
 
+const writeJsonFile = (filePath, data) => {
+    try {
+        backupJsonFile(filePath); 
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+        console.log(`Successfully wrote to ${filePath}`);
+        return true;
+    } catch (err) {
+        console.error(`Error writing to ${filePath}:`, err);
+        throw new Error("Failed to write JSON file");
+    }
+};
 
 // Get industries
 router.get('/industries', (req, res) => {
@@ -270,20 +279,15 @@ router.get('/industries', (req, res) => {
 // Update industries
 router.put('/industries', (req, res) => {
     try {
-        const updatedIndustries = req.body; 
+        const updatedIndustries = req.body;
 
-       
         if (!Array.isArray(updatedIndustries.carousel)) {
             return res.status(400).json({ error: "Invalid data format for industries" });
         }
 
-        
         const existingIndustries = readJsonFile(industriesPath);
-
-        
         existingIndustries.carousel = updatedIndustries.carousel;
 
-    
         writeJsonFile(industriesPath, existingIndustries);
         res.status(200).json({ message: "Industries updated successfully" });
     } catch (error) {
@@ -291,6 +295,7 @@ router.put('/industries', (req, res) => {
         res.status(500).json({ error: "Failed to update industries" });
     }
 });
+
 
 // Get capitals
 router.get('/capitals', (req, res) => {
