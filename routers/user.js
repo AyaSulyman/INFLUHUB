@@ -250,6 +250,7 @@ const writeJsonFile = (filePath, data) => {
 
 
 // Get industries
+// Get industries
 router.get('/industries', (req, res) => {
     try {
         const industries = readJsonFile(industriesPath);
@@ -265,13 +266,19 @@ router.put('/industries', (req, res) => {
     try {
         const updatedIndustries = req.body; 
 
-        
+        // Validate the incoming data structure
         if (!Array.isArray(updatedIndustries.carousel)) {
             return res.status(400).json({ error: "Invalid data format for industries" });
         }
 
+        // Read the existing industries from the file
+        const existingIndustries = readJsonFile(industriesPath);
+
+        // Merge the new industries with the existing ones
+        existingIndustries.carousel = updatedIndustries.carousel;
+
         // Write the updated data to the JSON file
-        writeJsonFile(industriesPath, { carousel: updatedIndustries.carousel });
+        writeJsonFile(industriesPath, existingIndustries);
         res.status(200).json({ message: "Industries updated successfully" });
     } catch (error) {
         console.error(error);
@@ -291,7 +298,6 @@ router.get('/capitals', (req, res) => {
 });
 
 // Update capitals
-// Update capitals
 router.put('/capitals', (req, res) => {
     try {
         const newCapitals = req.body; // Expecting the updated data in the request body
@@ -305,17 +311,20 @@ router.put('/capitals', (req, res) => {
         const existingCapitals = readJsonFile(capitalPath);
 
         // Merge the new capitals with the existing ones
-        const updatedCapitals = [...existingCapitals, ...newCapitals];
+        existingCapitals.forEach(existingCapital => {
+            if (existingCapital.Capital) {
+                existingCapital.Capital.push(...newCapitals[0].Capital);
+            }
+        });
 
         // Write the updated data to the JSON file
-        writeJsonFile(capitalPath, updatedCapitals);
+        writeJsonFile(capitalPath, existingCapitals);
         res.status(200).json({ message: "Capitals updated successfully" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to update capitals" });
     }
 });
-
 
 // Get degrees
 router.get('/degrees', (req, res) => {
@@ -333,13 +342,19 @@ router.put('/degrees', (req, res) => {
     try {
         const updatedDegrees = req.body; 
 
-       
+        // Validate the incoming data structure
         if (!Array.isArray(updatedDegrees)) {
             return res.status(400).json({ error: "Invalid data format for degrees" });
         }
 
-        
-        writeJsonFile(degreePath, updatedDegrees);
+        // Read the existing degrees from the file
+        const existingDegrees = readJsonFile(degreePath);
+
+        // Merge the new degrees with the existing ones
+        existingDegrees.push(...updatedDegrees);
+
+        // Write the updated data to the JSON file
+        writeJsonFile(degreePath, existingDegrees);
         res.status(200).json({ message: "Degrees updated successfully" });
     } catch (error) {
         console.error(error);
