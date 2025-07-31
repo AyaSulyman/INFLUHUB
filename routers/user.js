@@ -311,6 +311,7 @@ router.get('/capitals', (req, res) => {
 });
 
 // Update capitals
+// Update capitals
 router.put('/capitals', (req, res) => {
     try {
         const newCapitals = req.body;
@@ -320,7 +321,13 @@ router.put('/capitals', (req, res) => {
         }
 
         const existingCapitals = readJsonFile(capitalPath);
-        existingCapitals.push(...newCapitals); // Append new capitals
+
+        // Assuming the structure is as you provided, we need to access the first object and its "Capital" array
+        if (existingCapitals.length > 0 && existingCapitals[0].Capital) {
+            existingCapitals[0].Capital.push(...newCapitals); // Append new capitals to the existing array
+        } else {
+            return res.status(400).json({ error: "No existing capital structure found" });
+        }
 
         writeJsonFile(capitalPath, existingCapitals); // Write updated capitals to file
         res.status(200).json({ message: "Capitals updated successfully" });
