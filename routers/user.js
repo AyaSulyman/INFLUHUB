@@ -267,6 +267,7 @@ const writeJsonFile = (filePath, data) => {
 
 
 // Get industries
+// Get industries
 router.get('/industries', (req, res) => {
     try {
         const industries = readJsonFile(industriesPath);
@@ -286,10 +287,10 @@ router.put('/industries', (req, res) => {
             return res.status(400).json({ error: "Invalid data format for industries" });
         }
 
-
         const existingIndustries = readJsonFile(industriesPath);
 
-        existingIndustries.carousel = updatedIndustries.carousel;
+        // Use spread operator to combine existing and updated industries
+        existingIndustries.carousel = [...existingIndustries.carousel, ...updatedIndustries.carousel];
 
         writeJsonFile(industriesPath, existingIndustries);
         res.status(200).json({ message: "Industries updated successfully" });
@@ -298,7 +299,6 @@ router.put('/industries', (req, res) => {
         res.status(500).json({ error: "Failed to update industries" });
     }
 });
-
 
 // Get capitals
 router.get('/capitals', (req, res) => {
@@ -316,18 +316,14 @@ router.put('/capitals', (req, res) => {
     try {
         const newCapitals = req.body;
 
-       
         if (!Array.isArray(newCapitals) || newCapitals.length === 0) {
             return res.status(400).json({ error: "Invalid data format for capitals" });
         }
 
         const existingCapitals = readJsonFile(capitalPath);
 
-        existingCapitals.forEach(existingCapital => {
-            if (existingCapital.Capital) {
-                existingCapital.Capital.push(...newCapitals[0].Capital);
-            }
-        });
+        // Use spread operator to combine existing capitals with new capitals
+        existingCapitals.push(...newCapitals);
 
         writeJsonFile(capitalPath, existingCapitals);
         res.status(200).json({ message: "Capitals updated successfully" });
@@ -359,6 +355,7 @@ router.put('/degrees', (req, res) => {
 
         const existingDegrees = readJsonFile(degreePath);
 
+        // Use spread operator to combine existing degrees with updated degrees
         existingDegrees.push(...updatedDegrees);
 
         writeJsonFile(degreePath, existingDegrees);
