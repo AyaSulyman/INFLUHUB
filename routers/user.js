@@ -248,6 +248,7 @@ const writeJsonFile = (filePath, data) => {
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
 };
 
+
 // Get industries
 router.get('/industries', (req, res) => {
     try {
@@ -262,8 +263,15 @@ router.get('/industries', (req, res) => {
 // Update industries
 router.put('/industries', (req, res) => {
     try {
-        const updatedIndustries = req.body; // Expecting the updated data in the request body
-        writeJsonFile(industriesPath, updatedIndustries);
+        const updatedIndustries = req.body; 
+
+        
+        if (!Array.isArray(updatedIndustries.carousel)) {
+            return res.status(400).json({ error: "Invalid data format for industries" });
+        }
+
+        // Write the updated data to the JSON file
+        writeJsonFile(industriesPath, { carousel: updatedIndustries.carousel });
         res.status(200).json({ message: "Industries updated successfully" });
     } catch (error) {
         console.error(error);
@@ -285,7 +293,14 @@ router.get('/capitals', (req, res) => {
 // Update capitals
 router.put('/capitals', (req, res) => {
     try {
-        const updatedCapitals = req.body; // Expecting the updated data in the request body
+        const updatedCapitals = req.body;
+
+      
+        if (!Array.isArray(updatedCapitals)) {
+            return res.status(400).json({ error: "Invalid data format for capitals" });
+        }
+
+        
         writeJsonFile(capitalPath, updatedCapitals);
         res.status(200).json({ message: "Capitals updated successfully" });
     } catch (error) {
@@ -308,7 +323,14 @@ router.get('/degrees', (req, res) => {
 // Update degrees
 router.put('/degrees', (req, res) => {
     try {
-        const updatedDegrees = req.body; // Expecting the updated data in the request body
+        const updatedDegrees = req.body; 
+
+       
+        if (!Array.isArray(updatedDegrees)) {
+            return res.status(400).json({ error: "Invalid data format for degrees" });
+        }
+
+        
         writeJsonFile(degreePath, updatedDegrees);
         res.status(200).json({ message: "Degrees updated successfully" });
     } catch (error) {
@@ -316,6 +338,7 @@ router.put('/degrees', (req, res) => {
         res.status(500).json({ error: "Failed to update degrees" });
     }
 });
+
 
 let industries = readJsonFile(industriesPath);
 let capital = readJsonFile(capitalPath);
