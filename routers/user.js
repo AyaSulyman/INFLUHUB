@@ -238,6 +238,7 @@ const industriesPath = path.join(__dirname, '../json files/industries_base64.jso
 const capitalPath = path.join(__dirname, '../json files/Capitals.json');
 const degreePath = path.join(__dirname, '../json files/Degrees.json');
 
+// Function to read JSON files
 const readJsonFile = (filePath) => {
     try {
         return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -247,16 +248,18 @@ const readJsonFile = (filePath) => {
     }
 };
 
+// Function to create a backup of the JSON file
 const backupJsonFile = (filePath) => {
     const backupPath = `${filePath}.bak`;
     fs.copyFileSync(filePath, backupPath);
     console.log(`Backup created at ${backupPath}`);
 };
 
+// Function to write data to JSON files
 const writeJsonFile = (filePath, data) => {
     try {
-        backupJsonFile(filePath); 
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+        backupJsonFile(filePath); // Create a backup before writing
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2)); // Write the updated data
         console.log(`Successfully wrote to ${filePath}`);
         return true;
     } catch (err) {
@@ -265,8 +268,6 @@ const writeJsonFile = (filePath, data) => {
     }
 };
 
-
-// Get industries
 // Get industries
 router.get('/industries', (req, res) => {
     try {
@@ -288,11 +289,9 @@ router.put('/industries', (req, res) => {
         }
 
         const existingIndustries = readJsonFile(industriesPath);
+        existingIndustries.carousel = [...existingIndustries.carousel, ...updatedIndustries.carousel]; // Append new industries
 
-        // Use spread operator to combine existing and updated industries
-        existingIndustries.carousel = [...existingIndustries.carousel, ...updatedIndustries.carousel];
-
-        writeJsonFile(industriesPath, existingIndustries);
+        writeJsonFile(industriesPath, existingIndustries); // Write updated industries to file
         res.status(200).json({ message: "Industries updated successfully" });
     } catch (error) {
         console.error(error);
@@ -321,11 +320,9 @@ router.put('/capitals', (req, res) => {
         }
 
         const existingCapitals = readJsonFile(capitalPath);
+        existingCapitals.push(...newCapitals); // Append new capitals
 
-        // Use spread operator to combine existing capitals with new capitals
-        existingCapitals.push(...newCapitals);
-
-        writeJsonFile(capitalPath, existingCapitals);
+        writeJsonFile(capitalPath, existingCapitals); // Write updated capitals to file
         res.status(200).json({ message: "Capitals updated successfully" });
     } catch (error) {
         console.error(error);
@@ -354,17 +351,18 @@ router.put('/degrees', (req, res) => {
         }
 
         const existingDegrees = readJsonFile(degreePath);
+        existingDegrees.push(...updatedDegrees); // Append new degrees
 
-        // Use spread operator to combine existing degrees with updated degrees
-        existingDegrees.push(...updatedDegrees);
-
-        writeJsonFile(degreePath, existingDegrees);
+        writeJsonFile(degreePath, existingDegrees); // Write updated degrees to file
         res.status(200).json({ message: "Degrees updated successfully" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to update degrees" });
     }
 });
+
+
+
 
 
 let industries = readJsonFile(industriesPath);
