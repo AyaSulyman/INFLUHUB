@@ -291,16 +291,23 @@ router.get('/capitals', (req, res) => {
 });
 
 // Update capitals
+// Update capitals
 router.put('/capitals', (req, res) => {
     try {
-        const updatedCapitals = req.body;
+        const newCapitals = req.body; // Expecting the updated data in the request body
 
-      
-        if (!Array.isArray(updatedCapitals)) {
+        // Validate the incoming data structure
+        if (!Array.isArray(newCapitals) || newCapitals.length === 0) {
             return res.status(400).json({ error: "Invalid data format for capitals" });
         }
 
-        
+        // Read the existing capitals from the file
+        const existingCapitals = readJsonFile(capitalPath);
+
+        // Merge the new capitals with the existing ones
+        const updatedCapitals = [...existingCapitals, ...newCapitals];
+
+        // Write the updated data to the JSON file
         writeJsonFile(capitalPath, updatedCapitals);
         res.status(200).json({ message: "Capitals updated successfully" });
     } catch (error) {
@@ -308,6 +315,7 @@ router.put('/capitals', (req, res) => {
         res.status(500).json({ error: "Failed to update capitals" });
     }
 });
+
 
 // Get degrees
 router.get('/degrees', (req, res) => {
