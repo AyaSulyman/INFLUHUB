@@ -245,11 +245,18 @@ const readJsonFile = (filePath) => {
 
 // Helper function to write JSON file
 const writeJsonFile = (filePath, data) => {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+    try {
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+        console.log(`Successfully wrote to ${filePath}`); // Add logging
+        return true;
+    } catch (err) {
+        console.error(`Error writing to ${filePath}:`, err);
+        return false;
+    }
 };
 
 
-// Get industries
+
 // Get industries
 router.get('/industries', (req, res) => {
     try {
