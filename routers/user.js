@@ -234,9 +234,93 @@ router.post('/login', async (req, res) => {
 //Profile-Onboarding
 
 // Load JSON files
-const industries = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/industries_base64.json'), 'utf-8'));
-const capital = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Capitals.json'), 'utf-8'));
-const degree = JSON.parse(fs.readFileSync(path.join(__dirname, '../json files/Degrees.json'), 'utf-8'));
+const industriesPath = path.join(__dirname, '../json files/industries_base64.json');
+const capitalPath = path.join(__dirname, '../json files/Capitals.json');
+const degreePath = path.join(__dirname, '../json files/Degrees.json');
+
+// Helper function to read JSON file
+const readJsonFile = (filePath) => {
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+};
+
+// Helper function to write JSON file
+const writeJsonFile = (filePath, data) => {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+};
+
+// Get industries
+router.get('/industries', (req, res) => {
+    try {
+        const industries = readJsonFile(industriesPath);
+        res.status(200).json(industries);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to load industries" });
+    }
+});
+
+// Update industries
+router.put('/industries', (req, res) => {
+    try {
+        const updatedIndustries = req.body; // Expecting the updated data in the request body
+        writeJsonFile(industriesPath, updatedIndustries);
+        res.status(200).json({ message: "Industries updated successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to update industries" });
+    }
+});
+
+// Get capitals
+router.get('/capitals', (req, res) => {
+    try {
+        const capitals = readJsonFile(capitalPath);
+        res.status(200).json(capitals);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to load capitals" });
+    }
+});
+
+// Update capitals
+router.put('/capitals', (req, res) => {
+    try {
+        const updatedCapitals = req.body; // Expecting the updated data in the request body
+        writeJsonFile(capitalPath, updatedCapitals);
+        res.status(200).json({ message: "Capitals updated successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to update capitals" });
+    }
+});
+
+// Get degrees
+router.get('/degrees', (req, res) => {
+    try {
+        const degrees = readJsonFile(degreePath);
+        res.status(200).json(degrees);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to load degrees" });
+    }
+});
+
+// Update degrees
+router.put('/degrees', (req, res) => {
+    try {
+        const updatedDegrees = req.body; // Expecting the updated data in the request body
+        writeJsonFile(degreePath, updatedDegrees);
+        res.status(200).json({ message: "Degrees updated successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to update degrees" });
+    }
+});
+
+let industries = readJsonFile(industriesPath);
+let capital = readJsonFile(capitalPath);
+let degree = readJsonFile(degreePath);
+
 
 const multer = require("multer");
 
@@ -314,7 +398,7 @@ router.post(
                 user.Capital = Capital;
                 user.DigitalPresence = DigitalPresence;
 
-                
+
                 user.Degree = undefined;
                 user.isFreelancer = undefined;
 
