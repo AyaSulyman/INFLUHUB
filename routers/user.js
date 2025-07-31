@@ -238,16 +238,15 @@ const industriesPath = path.join(__dirname, '../json files/industries_base64.jso
 const capitalPath = path.join(__dirname, '../json files/Capitals.json');
 const degreePath = path.join(__dirname, '../json files/Degrees.json');
 
-// Helper function to read JSON file
 const readJsonFile = (filePath) => {
     return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 };
 
-// Helper function to write JSON file
+
 const writeJsonFile = (filePath, data) => {
     try {
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-        console.log(`Successfully wrote to ${filePath}`); // Add logging
+        console.log(`Successfully wrote to ${filePath}`); 
         return true;
     } catch (err) {
         console.error(`Error writing to ${filePath}:`, err);
@@ -273,18 +272,18 @@ router.put('/industries', (req, res) => {
     try {
         const updatedIndustries = req.body; 
 
-        // Validate the incoming data structure
+       
         if (!Array.isArray(updatedIndustries.carousel)) {
             return res.status(400).json({ error: "Invalid data format for industries" });
         }
 
-        // Read the existing industries from the file
+        
         const existingIndustries = readJsonFile(industriesPath);
 
-        // Merge the new industries with the existing ones
+        
         existingIndustries.carousel = updatedIndustries.carousel;
 
-        // Write the updated data to the JSON file
+    
         writeJsonFile(industriesPath, existingIndustries);
         res.status(200).json({ message: "Industries updated successfully" });
     } catch (error) {
@@ -307,24 +306,21 @@ router.get('/capitals', (req, res) => {
 // Update capitals
 router.put('/capitals', (req, res) => {
     try {
-        const newCapitals = req.body; // Expecting the updated data in the request body
+        const newCapitals = req.body;
 
-        // Validate the incoming data structure
+       
         if (!Array.isArray(newCapitals) || newCapitals.length === 0) {
             return res.status(400).json({ error: "Invalid data format for capitals" });
         }
 
-        // Read the existing capitals from the file
         const existingCapitals = readJsonFile(capitalPath);
 
-        // Merge the new capitals with the existing ones
         existingCapitals.forEach(existingCapital => {
             if (existingCapital.Capital) {
                 existingCapital.Capital.push(...newCapitals[0].Capital);
             }
         });
 
-        // Write the updated data to the JSON file
         writeJsonFile(capitalPath, existingCapitals);
         res.status(200).json({ message: "Capitals updated successfully" });
     } catch (error) {
@@ -349,18 +345,14 @@ router.put('/degrees', (req, res) => {
     try {
         const updatedDegrees = req.body; 
 
-        // Validate the incoming data structure
         if (!Array.isArray(updatedDegrees)) {
             return res.status(400).json({ error: "Invalid data format for degrees" });
         }
 
-        // Read the existing degrees from the file
         const existingDegrees = readJsonFile(degreePath);
 
-        // Merge the new degrees with the existing ones
         existingDegrees.push(...updatedDegrees);
 
-        // Write the updated data to the JSON file
         writeJsonFile(degreePath, existingDegrees);
         res.status(200).json({ message: "Degrees updated successfully" });
     } catch (error) {
@@ -380,96 +372,116 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.post(
-    "/profile-onboarding-submit",
-    upload.single("image"),
-    async (req, res) => {
-        try {
-            const {
-                email,
-                username: requestedUsername,
-                CountryCode,
-                PhoneNumber,
-                userType,
-                Industry,
-                Degree,
-                isFreelancer,
-                Type,
-                Capital,
-                DigitalPresence,
-            } = req.body;
 
+router.post("/updating-profile", upload.single("image"), async (req, res) => {
+    try {
+        const { email } = req.body;
 
-            if (!email || !CountryCode || !PhoneNumber || !userType) {
-                return res.status(400).json({ error: "All required fields must be filled." });
-            }
+    
+        if (!email) {
+            return res.status(400).json({ error: "Email is required." });
+        }
 
+        if (!req.file) {
+            return res.status(400).json({ error: "Image file is required." });
+        }
 
-            if (!req.file) {
-                return res.status(400).json({ error: "Image file is required." });
-            }
+        const mimeType = req.file.mimetype;
+        const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
 
-            const mimeType = req.file.mimetype;
-            const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
+       
+        const user = await User.findOne({ Email: email });
+        if (!user) return res.status(404).json({ error: "User  not found" });
 
-            const user = await User.findOne({ Email: email });
-            if (!user) return res.status(404).json({ error: "User not found" });
+      
+        user.image = base64Image;
 
-            const username = requestedUsername || email.split("@")[0];
+        
+        await user.save();
+        res.status(200).json({ message: "Profile image updated", data: user });
 
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
-            user.username = username;
-            user.CountryCode = CountryCode;
-            user.PhoneNumber = PhoneNumber;
-            user.userType = userType;
-            user.image = base64Image;
+router.post("/profile-onboarding-submit", async (req, res) => {
+    try {
+        const {
+            email,
+            username: requestedUsername,
+            CountryCode,
+            PhoneNumber,
+            userType,
+            Industry,
+            Degree,
+            isFreelancer,
+            Type,
+            Capital,
+            DigitalPresence,
+        } = req.body;
 
-            if (userType === "Retailer") {
-                if (!Industry || !Degree || typeof isFreelancer === "undefined") {
-                    return res.status(400).json({
-                        message: "All Retailer fields are required: Industry, Degree, and isFreelancer"
-                    });
-                }
+        if (!email || !CountryCode || !PhoneNumber || !userType) {
+            return res.status(400).json({ error: "All required fields must be filled." });
+        }
 
-                user.Industry = Industry;
-                user.Degree = Degree;
-                user.isFreelancer = isFreelancer;
+        const user = await User.findOne({ Email: email });
+        if (!user) return res.status(404).json({ error: "User  not found" });
 
-                user.Type = undefined;
-                user.Capital = undefined;
-                user.DigitalPresence = undefined;
+        const username = requestedUsername || email.split("@")[0];
+        user.username = username;
+        user.CountryCode = CountryCode;
+        user.PhoneNumber = PhoneNumber;
+        user.userType = userType;
 
-            } else if (userType === "Supplier") {
-                if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
-                    return res.status(400).json({
-                        message: "All Supplier fields are required: Industry, Type, Capital, and DigitalPresence"
-                    });
-                }
-
-                user.Industry = Industry;
-                user.Type = Type;
-                user.Capital = Capital;
-                user.DigitalPresence = DigitalPresence;
-
-
-                user.Degree = undefined;
-                user.isFreelancer = undefined;
-
-            } else {
+        if (userType === "Retailer") {
+            if (!Industry || !Degree || typeof isFreelancer === "undefined") {
                 return res.status(400).json({
-                    message: "Invalid userType. Must be either 'Retailer' or 'Supplier'"
+                    message: "All Retailer fields are required: Industry, Degree, and isFreelancer"
                 });
             }
 
-            await user.save();
-            res.status(200).json({ message: "Profile updated", data: user });
+            user.Industry = Industry;
+            user.Degree = Degree;
+            user.isFreelancer = isFreelancer;
 
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ error: err.message });
+            user.Type = undefined;
+            user.Capital = undefined;
+            user.DigitalPresence = undefined;
+
+        } else if (userType === "Supplier") {
+            if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
+                return res.status(400).json({
+                    message: "All Supplier fields are required: Industry, Type, Capital, and DigitalPresence"
+                });
+            }
+
+            user.Industry = Industry;
+            user.Type = Type;
+            user.Capital = Capital;
+            user.DigitalPresence = DigitalPresence;
+
+            user.Degree = undefined;
+            user.isFreelancer = undefined;
+
+        } else {
+            return res.status(400).json({
+                message: "Invalid userType. Must be either 'Retailer' or 'Supplier'"
+            });
         }
+
+        await user.save();
+        res.status(200).json({ message: "Profile updated", data: user });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
     }
-);
+});
+
+
+
 
 
 router.post('/check-username', async (req, res) => {
