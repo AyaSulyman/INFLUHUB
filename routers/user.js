@@ -265,6 +265,7 @@ const writeJsonFile = (filePath, data) => {
     }
 };
 
+
 // Get industries
 router.get('/industries', (req, res) => {
     try {
@@ -281,11 +282,13 @@ router.put('/industries', (req, res) => {
     try {
         const updatedIndustries = req.body;
 
-        if (!Array.isArray(updatedIndustries.carousel)) {
+        if (!updatedIndustries || !Array.isArray(updatedIndustries.carousel)) {
             return res.status(400).json({ error: "Invalid data format for industries" });
         }
 
+
         const existingIndustries = readJsonFile(industriesPath);
+
         existingIndustries.carousel = updatedIndustries.carousel;
 
         writeJsonFile(industriesPath, existingIndustries);
