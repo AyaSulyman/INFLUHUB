@@ -5,90 +5,112 @@ const bcryptjs = require('bcryptjs');
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true,
+        require: true,
         trim: true,
         unique: true
     },
-    email: {
+    Email: {
         type: String,
-        required: true,
+        require: true,
         trim: true,
         lowercase: true,
         unique: true,
         validate(val) {
-            if (!validator.isEmail(val)) {
-                throw new Error("Email is invalid");
+            if (validator.isEmpty(val)) {
+                throw new Error("email is invalid");
             }
         }
     },
-    password: {
+    Password: {
         type: String,
-        required: true,
+        require: true,
         trim: true,
         minlength: 8,
         validate(value) {
-            const passwordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])");
-            if (!passwordRegex.test(value)) {
-                throw new Error("Password must include uppercase, lowercase, number, and special characters");
+            let password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])")
+            if (!password.test(value)) {
+                throw new Error("password must included uppercase,lowercase,number ,and special characters")
             }
         }
     },
-    countryCode: {
-        type: Number,
-        required: true,
+
+    ConfirmPassword: {
+        type: String,
+        require: true,
         trim: true,
+        minlength: 8,
+        validate(val) {
+            if (val.length < 8) {
+                throw new Error("password must be greater than 8");
+            }
+        }
     },
-    phoneNumber: {
+
+    CountryCode: {
         type: Number,
-        required: true,
+        require: true,
         trim: true,
+
+    },
+    PhoneNumber: {
+        type: Number,
+        require: true,
+        trim: true,
+
+
     },
     userType: {
         type: String,
-        required: true
+        require: true
     },
-    industry: {
+ 
+    Industry: {
         type: String,
-        required: function () {
-            return this.userType === "Supplier" || this.userType === "Retailer";
+        require: function () {
+            return this.userType === "Supplier" || this.userType === "Retailer"
         }
     },
-    degree: {
+    Degree: {
         type: String,
-        required: function () {
-            return this.userType === "Retailer";
+        require: function () {
+            return this.userType === "Retailer"
         }
     },
-    type: {
+
+    Type: {
         type: String,
-        required: function () {
-            return this.userType === "Supplier";
+        require: function () {
+            return this.userType === "Supplier"
         }
     },
-    capital: {
+
+    Capital: {
         type: String,
-        required: function () {
-            return this.userType === "Supplier";
+        require: function () {
+            return this.userType === "Supplier"
         }
     },
-    digitalPresence: {
+    DigitalPresence: {
         type: String,
-        required: function () {
+        require: function () {
             return this.userType === 'Supplier';
         }
     },
     isFreelancer: {
         type: String,
-        required: function () {
+        require: function () {
             return this.userType === 'Retailer';
         }
     },
     image: {
-        type: String,
-        required: function () {
-            return this.userType === "Supplier" || this.userType === "Retailer";
+        type: String, 
+         require: function () {
+            return this.userType === "Supplier" || this.userType === "Retailer"
         }
     }
+
+
+
 }, {
     timestamps: true
 });
@@ -97,25 +119,22 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre("save", async function (next) {
     const user = this;
 
-    if (user.isModified('password')) {
-        user.password = await bcryptjs.hash(user.password, 10);
+    if (user.isModified('Password')) {
+        user.Password = await bcryptjs.hash(user.Password, 10);
     }
     next();
 });
 
-
-   UserSchema.methods.comparePassword = async function(candidatePassword) {
-       return await bcryptjs.compare(candidatePassword, this.password);
-   };
-   
-
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+    return await bcryptjs.compare(candidatePassword, this.Password); 
+};
 
 UserSchema.statics.findByCredentials = async function (email, password) {
     const user = await this.findOne({ email });
     if (!user) {
         throw new Error("Unable to login");
     }
-    const isMatch = await bcryptjs.compare(password, user.password);
+    const isMatch = await bcryptjs.compare(password, user.Password);
     if (!isMatch) {
         throw new Error("Unable to login");
     }

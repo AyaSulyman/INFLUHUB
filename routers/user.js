@@ -934,11 +934,8 @@ router.post('/change-password', async (req, res) => {
     const userId = req.header('userId'); 
     const { oldPassword, newPassword } = req.body;
 
-
-    console.log("Request Body:", req.body);
-
     if (!userId) {
-      return res.status(400).json({ error: "User  ID header is required" });
+      return res.status(400).json({ error: "userId header is missing" });
     }
 
     if (!oldPassword || !newPassword) {
@@ -956,51 +953,26 @@ router.post('/change-password', async (req, res) => {
       return res.status(404).json({ error: "User  not found" });
     }
 
- 
-    console.log("User  found:", user);
-
+    // Use the correct field name for password comparison
     const isMatch = await user.comparePassword(oldPassword);
-    console.log(`Comparing passwords: ${oldPassword} with ${user.password}`);
-
     if (!isMatch) {
-      return res.status(401).json({ 
-        error: "Current password is incorrect" 
+      return res.status(403).json({ 
+        error: "Old password is incorrect. Please try again!" 
       });
     }
 
-    const passwordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])");
-    if (!passwordRegex.test(newPassword)) {
-      return res.status(400).json({
-        error: "Password must include uppercase, lowercase, number, and special characters"
-      });
-    }
-
-    user.password = newPassword; 
-    await user.save(); 
+    // Directly assign the new password; the pre-save hook will handle hashing
+    user.Password = newPassword; // Use 'Password' as defined in your schema
+    await user.save();
 
     return res.status(200).json({
-      success: true,
       message: "Password changed successfully",
-      recommendation: "Consider enabling two-factor authentication for additional security"
     });
-
   } catch (error) {
-    console.error("Password change error:", error);
-    
-    if (error.name === 'CastError') {
-      return res.status(400).json({ 
-        error: "Invalid user ID format",
-        solution: "Please provide a valid MongoDB ObjectID"
-      });
-    }
-    
-    return res.status(500).json({ 
-      error: "Internal server error",
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    console.error("Error changing password:", error);
+    return res.status(500).json({ error: "Internal server error", details: error.message });
   }
 });
-
 
 
 module.exports = router;
