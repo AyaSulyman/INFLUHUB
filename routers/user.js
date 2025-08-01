@@ -238,35 +238,23 @@ const industriesPath = path.join(__dirname, '../json files/industries_base64.jso
 const capitalPath = path.join(__dirname, '../json files/Capitals.json');
 const degreePath = path.join(__dirname, '../json files/Degrees.json');
 
-// Function to read JSON files
 const readJsonFile = (filePath) => {
-    try {
-        return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    } catch (error) {
-        console.error(`Error reading ${filePath}:`, error);
-        throw new Error("Failed to read JSON file");
-    }
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 };
 
-// Function to create a backup of the JSON file
-const backupJsonFile = (filePath) => {
-    const backupPath = `${filePath}.bak`;
-    fs.copyFileSync(filePath, backupPath);
-    console.log(`Backup created at ${backupPath}`);
-};
 
-// Function to write data to JSON files
 const writeJsonFile = (filePath, data) => {
     try {
-        backupJsonFile(filePath); // Create a backup before writing
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2)); // Write the updated data
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
         console.log(`Successfully wrote to ${filePath}`);
         return true;
     } catch (err) {
         console.error(`Error writing to ${filePath}:`, err);
-        throw new Error("Failed to write JSON file");
+        return false;
     }
 };
+
+
 
 // Get industries
 router.get('/industries', (req, res) => {
@@ -284,14 +272,19 @@ router.put('/industries', (req, res) => {
     try {
         const updatedIndustries = req.body;
 
-        if (!updatedIndustries || !Array.isArray(updatedIndustries.carousel)) {
+
+        if (!Array.isArray(updatedIndustries.carousel)) {
             return res.status(400).json({ error: "Invalid data format for industries" });
         }
 
-        const existingIndustries = readJsonFile(industriesPath);
-        existingIndustries.carousel = [...existingIndustries.carousel, ...updatedIndustries.carousel]; // Append new industries
 
-        writeJsonFile(industriesPath, existingIndustries); // Write updated industries to file
+        const existingIndustries = readJsonFile(industriesPath);
+
+
+        existingIndustries.carousel = updatedIndustries.carousel;
+
+
+        writeJsonFile(industriesPath, existingIndustries);
         res.status(200).json({ message: "Industries updated successfully" });
     } catch (error) {
         console.error(error);
@@ -311,10 +304,10 @@ router.get('/capitals', (req, res) => {
 });
 
 // Update capitals
-// Update capitals
 router.put('/capitals', (req, res) => {
     try {
         const newCapitals = req.body;
+
 
         if (!Array.isArray(newCapitals) || newCapitals.length === 0) {
             return res.status(400).json({ error: "Invalid data format for capitals" });
@@ -322,14 +315,13 @@ router.put('/capitals', (req, res) => {
 
         const existingCapitals = readJsonFile(capitalPath);
 
-        // Assuming the structure is as you provided, we need to access the first object and its "Capital" array
-        if (existingCapitals.length > 0 && existingCapitals[0].Capital) {
-            existingCapitals[0].Capital.push(...newCapitals); // Append new capitals to the existing array
-        } else {
-            return res.status(400).json({ error: "No existing capital structure found" });
-        }
+        existingCapitals.forEach(existingCapital => {
+            if (existingCapital.Capital) {
+                existingCapital.Capital.push(...newCapitals[0].Capital);
+            }
+        });
 
-        writeJsonFile(capitalPath, existingCapitals); // Write updated capitals to file
+        writeJsonFile(capitalPath, existingCapitals);
         res.status(200).json({ message: "Capitals updated successfully" });
     } catch (error) {
         console.error(error);
@@ -351,16 +343,17 @@ router.get('/degrees', (req, res) => {
 // Update degrees
 router.put('/degrees', (req, res) => {
     try {
-        const updatedDegrees = req.body; 
+        const updatedDegrees = req.body;
 
         if (!Array.isArray(updatedDegrees)) {
             return res.status(400).json({ error: "Invalid data format for degrees" });
         }
 
         const existingDegrees = readJsonFile(degreePath);
-        existingDegrees.push(...updatedDegrees); // Append new degrees
 
-        writeJsonFile(degreePath, existingDegrees); // Write updated degrees to file
+        existingDegrees.push(...updatedDegrees);
+
+        writeJsonFile(degreePath, existingDegrees);
         res.status(200).json({ message: "Degrees updated successfully" });
     } catch (error) {
         console.error(error);
@@ -369,53 +362,9 @@ router.put('/degrees', (req, res) => {
 });
 
 
-
-
-
 let industries = readJsonFile(industriesPath);
 let capital = readJsonFile(capitalPath);
 let degree = readJsonFile(degreePath);
-
-
-const multer = require("multer");
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-
-router.post("/updating-profile", upload.single("image"), async (req, res) => {
-    try {
-        const userId = req.headers['id']; 
-
-  
-        if (!userId) {
-            return res.status(400).json({ error: "User  ID is required." });
-        }
-
-    
-        if (!req.file) {
-            return res.status(400).json({ error: "Image file is required." });
-        }
-
-        const mimeType = req.file.mimetype;
-        const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
-
-   
-        const user = await User.findById(userId); 
-        if (!user) return res.status(404).json({ error: "User  not found" });
-
-       
-        user.image = base64Image;
-
-        
-        await user.save();
-        res.status(200).json({ message: "Profile image updated", data: user });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
-});
 
 
 
@@ -921,6 +870,82 @@ router.post('/supplier/competitors', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
+
+//Profile Route
+const multer = require("multer");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+
+router.post("/updating-profile", upload.single("image"), async (req, res) => {
+    try {
+        const userId = req.headers['id'];
+        const name = req.body.name;
+
+        if (!userId) {
+            return res.status(400).json({ error: "User  ID is required." });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ error: "Image file is required." });
+        }
+
+        if (!name) {
+            return res.status(400).json({ error: "Name is required." });
+        }
+
+        const mimeType = req.file.mimetype;
+        const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User  not found." });
+        }
+
+        user.image = base64Image;
+        user.name = name;
+
+        await user.save();
+        res.status(200).json({ message: "Profile updated successfully", data: user });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "An error occurred while updating the profile." });
+    }
+});
+
+
+//change-password route
+router.post('/change-password', async (req, res) => {
+    try {
+        const userId = req.headers['userId'];
+        const oldPassword = req.headers['Password'];
+        const newPassword = req.body.newPassword; 
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+       
+        const isMatch = await user.comparePassword(oldPassword);
+        if (!isMatch) {
+            return res.status(403).json({ error: "Old Password is wrong. Try again!" });
+        }
+
+        
+        user.Password = await hashPassword(newPassword); 
+        await user.save();
+
+        return res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        console.error(error); 
+        return res.status(500).json({ error: "Service not running" });
+    }
+});
+
 
 
 module.exports = router;
