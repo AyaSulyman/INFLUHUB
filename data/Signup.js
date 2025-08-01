@@ -104,9 +104,10 @@ UserSchema.pre("save", async function (next) {
 });
 
 
-UserSchema.methods.comparePassword = async function(candidatePassword) {
-    return await bcryptjs.compare(candidatePassword, this.password);
-};
+   UserSchema.methods.comparePassword = async function(candidatePassword) {
+       return await bcryptjs.compare(candidatePassword, this.password);
+   };
+   
 
 
 UserSchema.statics.findByCredentials = async function (email, password) {
