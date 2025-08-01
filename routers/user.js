@@ -930,12 +930,12 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
 router.post('/change-password', async (req, res) => {
     try {
         const userId = req.headers['userId'];
-        const oldPassword = req.headers['Password'];
+        const oldPassword = req.body.oldPassword;
         const newPassword = req.body.newPassword; 
 
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ error: "User  not found" });
+            return res.status(404).json({ error: "User not found" });
         }
 
         const isMatch = await user.comparePassword(oldPassword);
@@ -943,15 +943,13 @@ router.post('/change-password', async (req, res) => {
             return res.status(403).json({ error: "Old password is incorrect. Please try again!" });
         }
 
-        user.password = await hashPassword(newPassword); 
+        user.Password = await hashPassword(newPassword); 
         await user.save();
 
         return res.status(200).json({ 
             message: "Password changed successfully",
-            data: {
-                oldPassword,
-                newPassword
-            }
+            oldPassword,
+            newPassword
         });
     } catch (error) {
         console.error(error); 
