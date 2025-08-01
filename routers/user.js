@@ -980,8 +980,8 @@ router.delete('/delete', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id
 
-        await Address.deleteMany({ userId: userId });
-        await Order.deleteMany({ userId: userId });
+        // await Address.deleteMany({ userId: userId });
+        // await Order.deleteMany({ userId: userId });
 
         await User.findByIdAndDelete(userId)
         return res.status(200).json({
