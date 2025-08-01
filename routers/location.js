@@ -21,7 +21,7 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// Add new address route
+//Adress Route
 router.post('/addresses', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id; 

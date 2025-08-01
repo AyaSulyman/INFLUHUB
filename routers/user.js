@@ -122,7 +122,7 @@ router.post('/resend-otp', async (req, res) => {
     try {
         const user = await User.findOne({ Email });
         if (!user) {
-            return res.status(404).json({ error: "User  not found" });
+            return res.status(404).json({ error: "User not found" });
         }
 
         const otp = crypto.randomInt(100000, 999999).toString();
@@ -980,7 +980,7 @@ router.delete('/delete', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id
 
-        // await Address.deleteMany({ userId: userId });
+        await Address.deleteMany({ userId: userId });
         // await Order.deleteMany({ userId: userId });
 
         await User.findByIdAndDelete(userId)
@@ -1005,7 +1005,7 @@ router.post('/change-language', authenticateToken, async (req, res) => {
         const userId = req.user.id;
         const { language } = req.body;
 
-        const validLanguages = ['English', 'عربي', 'French'];
+        const validLanguages = ['en', 'ar', 'fr'];
         if (!validLanguages.includes(language)) {
             return res.status(400).json({ error: "Invalid language code." });
         }
