@@ -953,7 +953,7 @@ router.post('/change-password', async (req, res) => {
       return res.status(404).json({ error: "User  not found" });
     }
 
-    // Use the correct field name for password comparison
+    
     const isMatch = await user.comparePassword(oldPassword);
     if (!isMatch) {
       return res.status(403).json({ 
@@ -961,8 +961,8 @@ router.post('/change-password', async (req, res) => {
       });
     }
 
-    // Directly assign the new password; the pre-save hook will handle hashing
-    user.Password = newPassword; // Use 'Password' as defined in your schema
+
+    user.Password = newPassword;
     await user.save();
 
     return res.status(200).json({
