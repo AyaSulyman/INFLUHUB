@@ -107,6 +107,10 @@ const UserSchema = new mongoose.Schema({
          require: function () {
             return this.userType === "Supplier" || this.userType === "Retailer"
         }
+    },
+    language:{
+        type:String,
+        require:true
     }
 
 
