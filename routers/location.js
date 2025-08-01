@@ -3,6 +3,10 @@ const router = express.Router();
 const Address = require('../data/address'); 
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const User = require('../data/Signup'); 
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const sendOtpEmail = async (email, otp) => {
     const transporter = nodemailer.createTransport({
@@ -28,6 +32,7 @@ const sendOtpEmail = async (email, otp) => {
         throw new Error('Failed to send OTP email.');
     }
 };
+
 //Middleware to authenticate access tokens
 const authenticateToken = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
