@@ -927,35 +927,37 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
 });
 
 //change-password route
-const hashPassword = async (password) => {
-  const salt = await bcryptjs.genSalt(10);
-  return await bcryptjs.hash(password, salt);
-};
-
-router.post("/change-password", authenticateToken, async (req, res) => {
+router.post('/change-password', async (req, res) => {
   try {
+    const userId = req.header('userId'); 
     const { oldPassword, newPassword } = req.body;
-    const userId = req.user.id; 
+
+    if (!userId) {
+      return res.status(400).json({ error: "userId header is missing" });
+    }
 
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User  not found" });
     }
 
-    const isMatch = await bcryptjs.compare(oldPassword, user.Password);
+    const isMatch = await user.comparePassword(oldPassword);
     if (!isMatch) {
       return res.status(403).json({ error: "Old password is incorrect. Please try again!" });
     }
 
-    user.Password = await hashPassword(newPassword);
+    user.password = await hashPassword(newPassword);
     await user.save();
 
-    return res.status(200).json({ message: "Password changed successfully" });
+    return res.status(200).json({
+      message: "Password changed successfully",
+    });
   } catch (error) {
-    console.error("Error changing password:", error);
+    console.error(error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 module.exports = router;
