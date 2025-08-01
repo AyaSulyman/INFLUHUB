@@ -904,7 +904,15 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
         user.name = name;
 
         await user.save();
-        res.status(200).json({ message: "Profile updated successfully", data: user });
+
+        res.status(200).json({ 
+            message: "Profile updated successfully", 
+            data: {
+                id: user._id,
+                name: user.name,
+                image: user.image
+            }
+        });
 
     } catch (err) {
         console.error(err);
