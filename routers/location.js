@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Address = require('../data/address'); 
-const User = require('../data/user'); 
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
