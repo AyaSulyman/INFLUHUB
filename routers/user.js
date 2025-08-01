@@ -905,13 +905,14 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
 
         await user.save();
 
+   
+        const userResponse = user.toObject();
+        delete userResponse.password; 
+        delete userResponse.__v; 
+
         res.status(200).json({ 
             message: "Profile updated successfully", 
-            data: {
-                id: user._id,
-                name: user.name,
-                image: user.image
-            }
+            data: userResponse 
         });
 
     } catch (err) {
