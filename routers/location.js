@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('./middleware/auth'); 
 const Address = require('../data/address'); 
 const User = require('../data/user'); 
 const nodemailer = require('nodemailer');
@@ -29,6 +28,20 @@ const sendOtpEmail = async (email, otp) => {
         console.error(`Error sending OTP to ${email}:`, error);
         throw new Error('Failed to send OTP email.');
     }
+};
+//Middleware to authenticate access tokens
+const authenticateToken = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+        return res.sendStatus(401);
+    }
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.sendStatus(403);
+        }
+        req.user = user;
+        next();
+    });
 };
 
 // Add new address route
