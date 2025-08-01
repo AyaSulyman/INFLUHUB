@@ -882,7 +882,7 @@ const upload = multer({ storage });
 router.post("/updating-profile", upload.single("image"), async (req, res) => {
     try {
         const userId = req.headers['id'];
-        const name = req.body.name;
+        const {firstName , lastName} = req.body;
 
         if (!userId) {
             return res.status(400).json({ error: "User  ID is required." });
@@ -901,7 +901,8 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
         }
 
         user.image = base64Image;
-        user.name = name;
+        user.firstName = firstName;
+        user.lastName = lastName
 
         await user.save();
 
@@ -909,7 +910,8 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
         const userResponse = {
             userId: user._id,
             username: user.username,
-            name: user.name,
+            firstName:user.firstName,
+            lastName:user.lastName,
             email: user.Email,
             image: user.image,
             phoneNumber: user.PhoneNumber 
@@ -953,11 +955,10 @@ router.post('/change-password', async (req, res) => {
       message: "Password changed successfully",
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("Error changing password:", error);
+    return res.status(500).json({ error: "Internal server error", details: error.message });
   }
 });
-
 
 
 module.exports = router;
