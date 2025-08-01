@@ -1,39 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Address = require('../data/address'); 
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../data/Signup'); 
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const sendOtpEmail = async (email, otp) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
-
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Your OTP Verification',
-        text: `Your OTP code is ${otp}`
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log(`OTP sent to ${email}`);
-    } catch (error) {
-        console.error(`Error sending OTP to ${email}:`, error);
-        throw new Error('Failed to send OTP email.');
-    }
-};
-
-//Middleware to authenticate access tokens
+// Middleware to authenticate access tokens
 const authenticateToken = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
@@ -69,7 +42,6 @@ router.post('/addresses', authenticateToken, async (req, res) => {
             });
         }
 
-
         const existingAddress = await Address.findOne({ user_id: userId, nickname, street, phone_number });
         if (existingAddress) {
             return res.status(400).json({
@@ -77,7 +49,6 @@ router.post('/addresses', authenticateToken, async (req, res) => {
                 message: "An address with the same nickname, street, and phone number already exists."
             });
         }
-
 
         const newAddress = new Address({
             user_id: userId,
@@ -92,14 +63,9 @@ router.post('/addresses', authenticateToken, async (req, res) => {
 
         await newAddress.save(); 
 
-
-        const otp = crypto.randomInt(100000, 999999).toString(); 
-        await sendOtpEmail(req.user.email, otp); 
-
-      
         return res.status(201).json({
             success: true,
-            message: "Address added successfully. An OTP has been sent to your email for verification.",
+            message: "Address added successfully.",
             data: newAddress
         });
     } catch (error) {
