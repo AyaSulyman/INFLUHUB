@@ -882,7 +882,7 @@ const upload = multer({ storage });
 router.post("/updating-profile", upload.single("image"), async (req, res) => {
     try {
         const userId = req.headers['id'];
-        const {firstName , lastName} = req.body;
+        const { firstName, lastName } = req.body;
 
         if (!userId) {
             return res.status(400).json({ error: "User  ID is required." });
@@ -906,20 +906,20 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
 
         await user.save();
 
-        
+
         const userResponse = {
             userId: user._id,
             username: user.username,
-            firstName:user.firstName,
-            lastName:user.lastName,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.Email,
             image: user.image,
-            phoneNumber: user.PhoneNumber 
+            phoneNumber: user.PhoneNumber
         };
 
-        res.status(200).json({ 
-            message: "Profile updated successfully", 
-            data: userResponse 
+        res.status(200).json({
+            message: "Profile updated successfully",
+            data: userResponse
         });
 
     } catch (err) {
@@ -930,49 +930,109 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
 
 //change-password route
 router.post('/change-password', async (req, res) => {
-  try {
-    const userId = req.header('userId'); 
-    const { oldPassword, newPassword } = req.body;
+    try {
+        const userId = req.header('userId');
+        const { oldPassword, newPassword } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ error: "userId header is missing" });
+        if (!userId) {
+            return res.status(400).json({ error: "userId header is missing" });
+        }
+
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ error: "Both old and new passwords are required" });
+        }
+
+        if (oldPassword === newPassword) {
+            return res.status(400).json({
+                error: "New password must be different from current password"
+            });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User  not found" });
+        }
+
+
+        const isMatch = await user.comparePassword(oldPassword);
+        if (!isMatch) {
+            return res.status(403).json({
+                error: "Old password is incorrect. Please try again!"
+            });
+        }
+
+
+        user.Password = newPassword;
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password changed successfully",
+        });
+    } catch (error) {
+        console.error("Error changing password:", error);
+        return res.status(500).json({ error: "Internal server error", details: error.message });
     }
-
-    if (!oldPassword || !newPassword) {
-      return res.status(400).json({ error: "Both old and new passwords are required" });
-    }
-
-    if (oldPassword === newPassword) {
-      return res.status(400).json({ 
-        error: "New password must be different from current password" 
-      });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User  not found" });
-    }
-
-    
-    const isMatch = await user.comparePassword(oldPassword);
-    if (!isMatch) {
-      return res.status(403).json({ 
-        error: "Old password is incorrect. Please try again!" 
-      });
-    }
-
-
-    user.Password = newPassword;
-    await user.save();
-
-    return res.status(200).json({
-      message: "Password changed successfully",
-    });
-  } catch (error) {
-    console.error("Error changing password:", error);
-    return res.status(500).json({ error: "Internal server error", details: error.message });
-  }
 });
+
+
+//Delete Account
+router.delete('/delete', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id
+
+        await Address.deleteMany({ userId: userId });
+        await Order.deleteMany({ userId: userId });
+
+        await User.findByIdAndDelete(userId)
+        return res.status(200).json({
+            success: true,
+            message: "Account deleted successfully."
+        });
+
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while deleting the account."
+        });
+    }
+})
+
+//change-language route
+router.post('/change-language', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { language } = req.body;
+
+        const validLanguages = ['English', 'عربي', 'French'];
+        if (!validLanguages.includes(language)) {
+            return res.status(400).json({ error: "Invalid language code." });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        user.language = language;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Language updated successfully.",
+            _id: user._id,
+            language: user.language,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while updating the language."
+        });
+    }
+});
+
 
 
 module.exports = router;
