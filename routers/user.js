@@ -892,10 +892,6 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
             return res.status(400).json({ error: "Image file is required." });
         }
 
-        if (!name) {
-            return res.status(400).json({ error: "Name is required." });
-        }
-
         const mimeType = req.file.mimetype;
         const base64Image = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
 
@@ -912,10 +908,9 @@ router.post("/updating-profile", upload.single("image"), async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: "An error occurred while updating the profile." });
+        res.status(500).json({ error: "Internal server error" });
     }
 });
-
 
 //change-password route
 router.post('/change-password', async (req, res) => {
@@ -926,26 +921,29 @@ router.post('/change-password', async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ error: "User  not found" });
         }
 
-       
         const isMatch = await user.comparePassword(oldPassword);
         if (!isMatch) {
-            return res.status(403).json({ error: "Old Password is wrong. Try again!" });
+            return res.status(403).json({ error: "Old password is incorrect. Please try again!" });
         }
 
-        
-        user.Password = await hashPassword(newPassword); 
+        user.password = await hashPassword(newPassword); 
         await user.save();
 
-        return res.status(200).json({ message: "Password changed successfully" });
+        return res.status(200).json({ 
+            message: "Password changed successfully",
+            data: {
+                oldPassword,
+                newPassword
+            }
+        });
     } catch (error) {
         console.error(error); 
-        return res.status(500).json({ error: "Service not running" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 });
-
 
 
 module.exports = router;
