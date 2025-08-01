@@ -935,30 +935,68 @@ router.post('/change-password', async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
     if (!userId) {
-      return res.status(400).json({ error: "userId header is missing" });
+      return res.status(400).json({ error: "User ID header is required" });
     }
 
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: "Both old and new passwords are required" });
+    }
+
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ 
+        error: "New password must be different from current password" 
+      });
+    }
+
+   
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ error: "User  not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     const isMatch = await user.comparePassword(oldPassword);
     if (!isMatch) {
-      return res.status(403).json({ error: "Old password is incorrect. Please try again!" });
+      return res.status(401).json({ 
+        error: "Current password is incorrect" 
+      });
     }
 
-    user.password = await hashPassword(newPassword);
-    await user.save();
+    const passwordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])");
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({
+        error: "Password must include uppercase, lowercase, number, and special characters"
+      });
+    }
 
+   
+    user.password = newPassword;
+    await user.save(); 
+
+ 
     return res.status(200).json({
+      success: true,
       message: "Password changed successfully",
+      recommendation: "Consider enabling two-factor authentication for additional security"
     });
+
   } catch (error) {
-    console.error("Error changing password:", error);
-    return res.status(500).json({ error: "Internal server error", details: error.message });
+    console.error("Password change error:", error);
+    
+
+    if (error.name === 'CastError') {
+      return res.status(400).json({ 
+        error: "Invalid user ID format",
+        solution: "Please provide a valid MongoDB ObjectID"
+      });
+    }
+    
+    return res.status(500).json({ 
+      error: "Internal server error",
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
+
 
 
 module.exports = router;
