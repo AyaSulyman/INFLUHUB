@@ -13,6 +13,8 @@ const bodyParser = require('body-parser')
 const addressRoutes = require('../routers/location')
 
 
+
+
 const app = express();
 
 app.use(express.json());
@@ -30,7 +32,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.error("MongoDB connection error:", error);
 });
 
-  
+
 const verifyRefreshToken = (req, res, next) => {
   const refreshToken = req.headers['refresh-token'];
   console.log("Received refresh token:", refreshToken);
@@ -67,10 +69,10 @@ app.get('/status', verifyRefreshToken, (req, res) => {
 app.use('/app/dashboard', loginRoutes);
 app.use('/api/authentication', loginRoutes)
 app.use('/api', loginRoutes)
-app.use('/api/user',loginRoutes)
+app.use('/api/user', loginRoutes)
 
 
-app.use('/api/user',addressRoutes)
+app.use('/api/user', addressRoutes)
 
 const port = process.env.PORT || 3000;
 
@@ -89,9 +91,9 @@ if (process.env.NODE_ENV === 'production') {
   });
 } else {
 
-app.listen(process.env.PORT || 3000 ,()=>{
-   console.log(`Server running on https://influhub-1.onrender.com`);
-})
+  app.listen(process.env.PORT || 3000, () => {
+    console.log(`Server running on https://influhub-1.onrender.com`);
+  })
 
 
 }

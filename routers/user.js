@@ -9,6 +9,8 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
+const Address = require('../data/address');
+console.log(Address); 
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
