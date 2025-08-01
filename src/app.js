@@ -10,6 +10,7 @@ const bcryptjs = require('bcryptjs');
 const loginRoutes = require('../routers/user');
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const addressRoutes = require('../routers/location')
 
 
 const app = express();
@@ -62,12 +63,14 @@ app.get('/status', verifyRefreshToken, (req, res) => {
   res.status(200).json({ message: "Service is up and running" });
 });
 
+
 app.use('/app/dashboard', loginRoutes);
 app.use('/api/authentication', loginRoutes)
 app.use('/api', loginRoutes)
 app.use('/api/user',loginRoutes)
 
 
+app.use('/api/user',addressRoutes)
 
 const port = process.env.PORT || 3000;
 

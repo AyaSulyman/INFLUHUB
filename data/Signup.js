@@ -113,8 +113,6 @@ const UserSchema = new mongoose.Schema({
         require:true
     }
 
-
-
 }, {
     timestamps: true
 });
