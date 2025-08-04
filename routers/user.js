@@ -428,7 +428,6 @@ router.post("/profile-onboarding-submit", async (req, res) => {
             Degree,
             isFreelancer,
             Type,
-            Capital,
             DigitalPresence,
         } = req.body;
 
@@ -445,6 +444,10 @@ router.post("/profile-onboarding-submit", async (req, res) => {
         user.PhoneNumber = PhoneNumber;
         user.userType = userType;
 
+        // Fetch the capital array from the database
+        const capitalDocument = await Capital.findOne({});
+        const capitals = capitalDocument ? capitalDocument.Capital : []; // Get the capital array or an empty array
+
         if (userType === "Retailer") {
             if (!Industry || !Degree || typeof isFreelancer === "undefined") {
                 return res.status(400).json({
@@ -457,19 +460,19 @@ router.post("/profile-onboarding-submit", async (req, res) => {
             user.isFreelancer = isFreelancer;
 
             user.Type = undefined;
-            user.Capital = undefined;
+            user.Capital = undefined; // You can set this if needed
             user.DigitalPresence = undefined;
 
         } else if (userType === "Supplier") {
-            if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
+            if (!Industry || !Type || !DigitalPresence) {
                 return res.status(400).json({
-                    message: "All Supplier fields are required: Industry, Type, Capital, and DigitalPresence"
+                    message: "All Supplier fields are required: Industry, Type, and DigitalPresence"
                 });
             }
 
             user.Industry = Industry;
             user.Type = Type;
-            user.Capital = Capital;
+            user.Capital = capitals; // Use the capitals array from the database
             user.DigitalPresence = DigitalPresence;
 
             user.Degree = undefined;
