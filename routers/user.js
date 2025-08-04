@@ -260,6 +260,7 @@ const writeJsonFile = (filePath, data) => {
 const Capital = require('../data/Capital');
 const Degree = require('../data/Degree');
 
+
 // Get all capitals
 router.get('/capitals', async (req, res) => {
     try {
@@ -410,7 +411,7 @@ router.put('/degrees', (req, res) => {
 
 
 let industries = readJsonFile(industriesPath);
-let capital = readJsonFile(capitalPath);
+
 let degree = readJsonFile(degreePath);
 
 
@@ -428,6 +429,7 @@ router.post("/profile-onboarding-submit", async (req, res) => {
             Degree,
             isFreelancer,
             Type,
+            Capital,
             DigitalPresence,
         } = req.body;
 
@@ -444,10 +446,6 @@ router.post("/profile-onboarding-submit", async (req, res) => {
         user.PhoneNumber = PhoneNumber;
         user.userType = userType;
 
-        // Fetch the capital array from the database
-        const capitalDocument = await Capital.findOne({});
-        const capitals = capitalDocument ? capitalDocument.Capital : []; // Get the capital array or an empty array
-
         if (userType === "Retailer") {
             if (!Industry || !Degree || typeof isFreelancer === "undefined") {
                 return res.status(400).json({
@@ -460,19 +458,19 @@ router.post("/profile-onboarding-submit", async (req, res) => {
             user.isFreelancer = isFreelancer;
 
             user.Type = undefined;
-            user.Capital = undefined; // You can set this if needed
+            user.Capital = undefined;
             user.DigitalPresence = undefined;
 
         } else if (userType === "Supplier") {
-            if (!Industry || !Type || !DigitalPresence) {
+            if (!Industry || !Type || !Capital || typeof DigitalPresence === "undefined") {
                 return res.status(400).json({
-                    message: "All Supplier fields are required: Industry, Type, and DigitalPresence"
+                    message: "All Supplier fields are required: Industry, Type, Capital, and DigitalPresence"
                 });
             }
 
             user.Industry = Industry;
             user.Type = Type;
-            user.Capital = capitals; // Use the capitals array from the database
+            user.Capital = Capital;
             user.DigitalPresence = DigitalPresence;
 
             user.Degree = undefined;
@@ -541,7 +539,6 @@ router.get('/profile-onboarding-submit/:_id', async (req, res) => {
     }
 });
 
-
 router.get('/profile-onboarding', async (req, res) => {
     try {
         const industriesWithSuppliers = industries.carousel.map(industry => {
@@ -549,9 +546,9 @@ router.get('/profile-onboarding', async (req, res) => {
             return { ...industry, Suppliers: suppliers };
         });
 
-    
+     
         const capitalDocument = await Capital.findOne({});
-        const capitals = capitalDocument ? capitalDocument.Capital : [];
+        const capitals = capitalDocument ? capitalDocument.Capital : []; 
 
         res.status(200).json({
             industries: industriesWithSuppliers,
