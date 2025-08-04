@@ -548,10 +548,15 @@ router.get('/profile-onboarding', async (req, res) => {
             const suppliers = getSuppliersByIndustry(industry.industry);
             return { ...industry, Suppliers: suppliers };
         });
+
+    
+        const capitalDocument = await Capital.findOne({});
+        const capitals = capitalDocument ? capitalDocument.Capital : [];
+
         res.status(200).json({
             industries: industriesWithSuppliers,
             degrees: degree,
-            capitals: capital
+            capitals: capitals
         });
     } catch (error) {
         console.error(error);
