@@ -237,8 +237,7 @@ router.post('/login', async (req, res) => {
 
 // Load JSON files
 const industriesPath = path.join(__dirname, '../json files/industries_base64.json');
-const capitalPath = path.join(__dirname, '../json files/Capitals.json');
-const degreePath = path.join(__dirname, '../json files/Degrees.json');
+
 
 const readJsonFile = (filePath) => {
     return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -434,7 +433,6 @@ router.put('/degrees', (req, res) => {
 
 let industries = readJsonFile(industriesPath);
 
-let degree = readJsonFile(degreePath);
 
 
 
