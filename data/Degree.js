@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
 
 const degreeSchema = new mongoose.Schema({
-    Degree: {
+    Degrees: {
         type: [String], 
         required: true
     }
 });
 
-const Degree = mongoose.models.Degree || mongoose.model('Degree', degreeSchema);
-
+const Degree = mongoose.model('Degree', degreeSchema);
 module.exports = Degree;

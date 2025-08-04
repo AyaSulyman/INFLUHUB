@@ -349,14 +349,31 @@ router.get('/degrees', async (req, res) => {
 // Create a new degree
 router.post('/degrees', async (req, res) => {
     try {
-        const newDegree = new Degree(req.body);
-        await newDegree.save();
-        res.status(201).json(newDegree);
+        const { Degrees } = req.body; 
+
+        if (!Array.isArray(Degrees)) {
+            return res.status(400).json({ error: "Degrees must be an array" });
+        }
+
+      
+        const existingDegreeDocument = await Degree.findOne({});
+
+        if (existingDegreeDocument) {
+            existingDegreeDocument.Degrees.push(...Degrees); 
+            await existingDegreeDocument.save(); 
+        } else {
+          
+            const degreeDoc = new Degree({ Degrees });
+            await degreeDoc.save();
+        }
+
+        res.status(201).json({ message: "Degrees saved successfully" });
     } catch (error) {
         console.error(error);
-        res.status(400).json({ error: "Failed to create degree" });
+        res.status(400).json({ error: "Failed to create degrees" });
     }
 });
+
 
 // Update degrees
 router.put('/degrees/:id', async (req, res) => {
