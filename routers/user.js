@@ -237,7 +237,8 @@ router.post('/login', async (req, res) => {
 
 // Load JSON files
 const industriesPath = path.join(__dirname, '../json files/industries_base64.json');
-
+const capitalPath = path.join(__dirname, '../json files/Capitals.json');
+const degreePath = path.join(__dirname, '../json files/Degrees.json');
 
 const readJsonFile = (filePath) => {
     return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -334,50 +335,28 @@ router.delete('/capitals/:id', async (req, res) => {
     }
 });
 
-
 // Get all degrees
 router.get('/degrees', async (req, res) => {
     try {
-        const degrees = await Degree.findOne({}); 
-        if (!degrees) {
-            return res.status(404).json({ error: "No degrees found" });
-        }
-        res.status(200).json(degrees.Degrees); // Return the array of degrees
+        const degrees = await Degree.find({});
+        res.status(200).json(degrees);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to load degrees" });
     }
 });
 
-
 // Create a new degree
 router.post('/degrees', async (req, res) => {
     try {
-        const { Degrees } = req.body; 
-
-        if (!Array.isArray(Degrees)) {
-            return res.status(400).json({ error: "Degrees must be an array" });
-        }
-
-      
-        const existingDegreeDocument = await Degree.findOne({});
-
-        if (existingDegreeDocument) {
-            existingDegreeDocument.Degrees.push(...Degrees); 
-            await existingDegreeDocument.save(); 
-        } else {
-          
-            const degreeDoc = new Degree({ Degrees });
-            await degreeDoc.save();
-        }
-
-        res.status(201).json({ message: "Degrees saved successfully" });
+        const newDegree = new Degree(req.body);
+        await newDegree.save();
+        res.status(201).json(newDegree);
     } catch (error) {
         console.error(error);
-        res.status(400).json({ error: "Failed to create degrees" });
+        res.status(400).json({ error: "Failed to create degree" });
     }
 });
-
 
 // Update degrees
 router.put('/degrees/:id', async (req, res) => {
@@ -433,6 +412,7 @@ router.put('/degrees', (req, res) => {
 
 let industries = readJsonFile(industriesPath);
 
+let degree = readJsonFile(degreePath);
 
 
 
