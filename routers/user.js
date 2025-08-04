@@ -262,11 +262,10 @@ const Degree = require('../data/Degree');
 
 
 // Get all capitals
+// Get all capitals
 router.get('/capitals', async (req, res) => {
     try {
-    
         const capitalDocument = await Capital.findOne({}); 
-
         if (!capitalDocument) {
             return res.status(404).json({ error: "No capitals found" });
         }
