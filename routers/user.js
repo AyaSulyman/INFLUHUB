@@ -257,47 +257,13 @@ const writeJsonFile = (filePath, data) => {
 };
 
 
+const Capital = require('../data/Capital');
+const Degree = require('../data/Degree');
 
-// Get industries
-router.get('/industries', (req, res) => {
+// Get all capitals
+router.get('/capitals', async (req, res) => {
     try {
-        const industries = readJsonFile(industriesPath);
-        res.status(200).json(industries);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to load industries" });
-    }
-});
-
-// Update industries
-router.put('/industries', (req, res) => {
-    try {
-        const updatedIndustries = req.body;
-
-
-        if (!Array.isArray(updatedIndustries.carousel)) {
-            return res.status(400).json({ error: "Invalid data format for industries" });
-        }
-
-
-        const existingIndustries = readJsonFile(industriesPath);
-
-
-        existingIndustries.carousel = updatedIndustries.carousel;
-
-
-        writeJsonFile(industriesPath, existingIndustries);
-        res.status(200).json({ message: "Industries updated successfully" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to update industries" });
-    }
-});
-
-// Get capitals
-router.get('/capitals', (req, res) => {
-    try {
-        const capitals = readJsonFile(capitalPath);
+        const capitals = await Capital.find({});
         res.status(200).json(capitals);
     } catch (error) {
         console.error(error);
@@ -305,42 +271,98 @@ router.get('/capitals', (req, res) => {
     }
 });
 
-// Update capitals
-router.put('/capitals', (req, res) => {
+// Create a new capital
+router.post('/capitals', async (req, res) => {
     try {
-        const newCapitals = req.body;
-
-
-        if (!Array.isArray(newCapitals) || newCapitals.length === 0) {
-            return res.status(400).json({ error: "Invalid data format for capitals" });
-        }
-
-        const existingCapitals = readJsonFile(capitalPath);
-
-        existingCapitals.forEach(existingCapital => {
-            if (existingCapital.Capital) {
-                existingCapital.Capital.push(...newCapitals[0].Capital);
-            }
-        });
-
-        writeJsonFile(capitalPath, existingCapitals);
-        res.status(200).json({ message: "Capitals updated successfully" });
+        const newCapital = new Capital(req.body);
+        await newCapital.save();
+        res.status(201).json(newCapital);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Failed to update capitals" });
+        res.status(400).json({ error: "Failed to create capital" });
     }
 });
 
-// Get degrees
-router.get('/degrees', (req, res) => {
+// Update capitals
+router.put('/capitals/:id', async (req, res) => {
     try {
-        const degrees = readJsonFile(degreePath);
+        const updatedCapital = await Capital.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedCapital) {
+            return res.status(404).json({ error: "Capital not found" });
+        }
+        res.status(200).json(updatedCapital);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "Failed to update capital" });
+    }
+});
+
+// Delete a capital
+router.delete('/capitals/:id', async (req, res) => {
+    try {
+        const deletedCapital = await Capital.findByIdAndDelete(req.params.id);
+        if (!deletedCapital) {
+            return res.status(404).json({ error: "Capital not found" });
+        }
+        res.status(200).json({ message: "Capital deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to delete capital" });
+    }
+});
+
+// Get all degrees
+router.get('/degrees', async (req, res) => {
+    try {
+        const degrees = await Degree.find({});
         res.status(200).json(degrees);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to load degrees" });
     }
 });
+
+// Create a new degree
+router.post('/degrees', async (req, res) => {
+    try {
+        const newDegree = new Degree(req.body);
+        await newDegree.save();
+        res.status(201).json(newDegree);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "Failed to create degree" });
+    }
+});
+
+// Update degrees
+router.put('/degrees/:id', async (req, res) => {
+    try {
+        const updatedDegree = await Degree.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedDegree) {
+            return res.status(404).json({ error: "Degree not found" });
+        }
+        res.status(200).json(updatedDegree);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "Failed to update degree" });
+    }
+});
+
+// Delete a degree
+router.delete('/degrees/:id', async (req, res) => {
+    try {
+        const deletedDegree = await Degree.findByIdAndDelete(req.params.id);
+        if (!deletedDegree) {
+            return res.status(404).json({ error: "Degree not found" });
+        }
+        res.status(200).json({ message: "Degree deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to delete degree" });
+    }
+});
+
+
 
 // Update degrees
 router.put('/degrees', (req, res) => {

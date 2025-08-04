@@ -16,9 +16,6 @@ const swaggerDocument = require('../docs/swagger');
 
 
 
-
-
-
 const app = express();
 
 app.use(express.json());
