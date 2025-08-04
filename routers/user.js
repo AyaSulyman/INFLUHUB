@@ -263,8 +263,13 @@ const Degree = require('../data/Degree');
 // Get all capitals
 router.get('/capitals', async (req, res) => {
     try {
-        const capitals = await Capital.find({});
-        res.status(200).json(capitals);
+    
+        const capitalDocument = await Capital.findOne({}); 
+
+        if (!capitalDocument) {
+            return res.status(404).json({ error: "No capitals found" });
+        }
+        res.status(200).json(capitalDocument.Capital);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to load capitals" });
@@ -275,21 +280,30 @@ router.get('/capitals', async (req, res) => {
 // Create a new capital
 router.post('/capitals', async (req, res) => {
     try {
-        const newCapital = new Capital(req.body);
-        await newCapital.save();
+        const newCapital = req.body.Capital; // Assume input is { "Capital": "New Capital" }
 
-        const existingCapitals = readJsonFile(capitalPath);
+        // Find the existing capital document
+        const existingCapital = await Capital.findOne({}); // Assuming there's only one document
 
-        existingCapitals.push(newCapital);
+        if (existingCapital) {
+            // Add new capital to the existing array
+            if (!existingCapital.Capital.includes(newCapital)) {
+                existingCapital.Capital.push(newCapital);
+                await existingCapital.save(); // Save the updated document
+            }
+        } else {
+            // If no document exists, create a new one
+            const capitalDoc = new Capital({ Capital: [newCapital] });
+            await capitalDoc.save();
+        }
 
-        writeJsonFile(capitalPath, existingCapitals);
-
-        res.status(201).json(newCapital);
+        res.status(201).json({ message: "Capital added successfully" });
     } catch (error) {
         console.error(error);
         res.status(400).json({ error: "Failed to create capital" });
     }
 });
+
 
 
 // Update capitals
