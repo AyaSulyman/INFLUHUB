@@ -461,13 +461,6 @@ router.delete('/industries/:id', async (req, res) => {
 });
 
 
-
-
-let degree = readJsonFile(degreePath);
-
-
-
-
 router.post("/profile-onboarding-submit", async (req, res) => {
     try {
         const {
@@ -592,13 +585,14 @@ router.get('/profile-onboarding-submit/:_id', async (req, res) => {
 
 router.get('/profile-onboarding', async (req, res) => {
     try {
-        const industries = await Industry.find({}); // Fetch industries from the database
+        const industries = await Industry.find({});
         const capitalDocument = await Capital.findOne({});
         const capitals = capitalDocument ? capitalDocument.Capital : []; 
+        const degrees = await Degree.find({}); 
 
         res.status(200).json({
             industries: industries,
-            degrees: degree,
+            degrees: degrees.map(degree => degree.Degrees).flat(), 
             capitals: capitals
         });
     } catch (error) {
