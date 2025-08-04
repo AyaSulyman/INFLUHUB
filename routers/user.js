@@ -261,7 +261,7 @@ const Capital = require('../data/Capital');
 const Degree = require('../data/Degree');
 
 
-// Get all capitals
+
 // Get all capitals
 router.get('/capitals', async (req, res) => {
     try {
@@ -280,19 +280,19 @@ router.get('/capitals', async (req, res) => {
 // Create a new capital
 router.post('/capitals', async (req, res) => {
     try {
-        const newCapital = req.body.Capital; // Assume input is { "Capital": "New Capital" }
+        const newCapital = req.body.Capital; 
 
-        // Find the existing capital document
-        const existingCapital = await Capital.findOne({}); // Assuming there's only one document
+  
+        const existingCapital = await Capital.findOne({}); 
 
         if (existingCapital) {
-            // Add new capital to the existing array
+          
             if (!existingCapital.Capital.includes(newCapital)) {
                 existingCapital.Capital.push(newCapital);
-                await existingCapital.save(); // Save the updated document
+                await existingCapital.save(); 
             }
         } else {
-            // If no document exists, create a new one
+          
             const capitalDoc = new Capital({ Capital: [newCapital] });
             await capitalDoc.save();
         }
@@ -408,8 +408,60 @@ router.put('/degrees', (req, res) => {
     }
 });
 
+const Industry = require('../data/Industry'); 
+// Get all industries
+router.get('/industries', async (req, res) => {
+    try {
+        const industries = await Industry.find({});
+        res.status(200).json(industries);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to load industries" });
+    }
+});
 
-let industries = readJsonFile(industriesPath);
+// Create a new industry
+router.post('/industries', async (req, res) => {
+    try {
+        const newIndustry = new Industry(req.body);
+        await newIndustry.save();
+        res.status(201).json(newIndustry);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "Failed to create industry" });
+    }
+});
+
+// Update an industry
+router.put('/industries/:id', async (req, res) => {
+    try {
+        const updatedIndustry = await Industry.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedIndustry) {
+            return res.status(404).json({ error: "Industry not found" });
+        }
+        res.status(200).json(updatedIndustry);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "Failed to update industry" });
+    }
+});
+
+// Delete an industry
+router.delete('/industries/:id', async (req, res) => {
+    try {
+        const deletedIndustry = await Industry.findByIdAndDelete(req.params.id);
+        if (!deletedIndustry) {
+            return res.status(404).json({ error: "Industry not found" });
+        }
+        res.status(200).json({ message: "Industry deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to delete industry" });
+    }
+});
+
+
+
 
 let degree = readJsonFile(degreePath);
 
@@ -540,17 +592,12 @@ router.get('/profile-onboarding-submit/:_id', async (req, res) => {
 
 router.get('/profile-onboarding', async (req, res) => {
     try {
-        const industriesWithSuppliers = industries.carousel.map(industry => {
-            const suppliers = getSuppliersByIndustry(industry.industry);
-            return { ...industry, Suppliers: suppliers };
-        });
-
-     
+        const industries = await Industry.find({}); // Fetch industries from the database
         const capitalDocument = await Capital.findOne({});
         const capitals = capitalDocument ? capitalDocument.Capital : []; 
 
         res.status(200).json({
-            industries: industriesWithSuppliers,
+            industries: industries,
             degrees: degree,
             capitals: capitals
         });
@@ -559,6 +606,7 @@ router.get('/profile-onboarding', async (req, res) => {
         res.status(500).json({ error: "Failed to load onboarding options" });
     }
 });
+
 
 
 
