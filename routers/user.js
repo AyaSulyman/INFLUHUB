@@ -335,16 +335,21 @@ router.delete('/capitals/:id', async (req, res) => {
     }
 });
 
+
 // Get all degrees
 router.get('/degrees', async (req, res) => {
     try {
-        const degrees = await Degree.find({});
-        res.status(200).json(degrees);
+        const degrees = await Degree.findOne({}); 
+        if (!degrees) {
+            return res.status(404).json({ error: "No degrees found" });
+        }
+        res.status(200).json(degrees.Degrees); 
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to load degrees" });
     }
 });
+
 
 // Create a new degree
 router.post('/degrees', async (req, res) => {
