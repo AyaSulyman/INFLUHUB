@@ -11,6 +11,10 @@ const loginRoutes = require('../routers/user');
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const addressRoutes = require('../routers/location')
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../docs/swagger'); 
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 
