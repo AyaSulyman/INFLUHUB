@@ -342,7 +342,7 @@ router.get('/degrees', async (req, res) => {
         if (!degrees) {
             return res.status(404).json({ error: "No degrees found" });
         }
-        res.status(200).json(degrees.Degrees); 
+        res.status(200).json(degrees.Degrees); // Return the array of degrees
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to load degrees" });
