@@ -244,7 +244,6 @@ const readJsonFile = (filePath) => {
     return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 };
 
-
 const writeJsonFile = (filePath, data) => {
     try {
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
@@ -255,6 +254,7 @@ const writeJsonFile = (filePath, data) => {
         return false;
     }
 };
+
 
 
 const Capital = require('../data/Capital');
@@ -271,17 +271,26 @@ router.get('/capitals', async (req, res) => {
     }
 });
 
+
 // Create a new capital
 router.post('/capitals', async (req, res) => {
     try {
         const newCapital = new Capital(req.body);
         await newCapital.save();
+
+        const existingCapitals = readJsonFile(capitalPath);
+
+        existingCapitals.push(newCapital);
+
+        writeJsonFile(capitalPath, existingCapitals);
+
         res.status(201).json(newCapital);
     } catch (error) {
         console.error(error);
         res.status(400).json({ error: "Failed to create capital" });
     }
 });
+
 
 // Update capitals
 router.put('/capitals/:id', async (req, res) => {
