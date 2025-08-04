@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 
-const capitalSchema = new mongoose.Schema({
-    Capital: {
+const degreeSchema = new mongoose.Schema({
+    Degree: {
         type: [String], 
         required: true
     }
 });
 
-module.exports = mongoose.model('Capital', capitalSchema);
+const Degree = mongoose.models.Degree || mongoose.model('Degree', degreeSchema);
+
+module.exports = Degree;

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const capitalSchema = new mongoose.Schema({
     Capital: {
-        type: [String],
+        type: [String], 
         required: true
     }
 });
