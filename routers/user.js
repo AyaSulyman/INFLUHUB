@@ -464,7 +464,7 @@ router.delete('/industries/:id', async (req, res) => {
 router.post("/profile-onboarding-submit", async (req, res) => {
     try {
         const {
-            email,
+            email, // This is where the error occurs if email is undefined
             username: requestedUsername,
             CountryCode,
             PhoneNumber,
