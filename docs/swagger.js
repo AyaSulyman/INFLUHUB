@@ -1,3 +1,4 @@
+// swagger.js
 module.exports = {
   openapi: '3.0.0',
   info: {
@@ -45,14 +46,14 @@ module.exports = {
                 }
               }
             }
-          }
-        },
-        responses: {
-          200: {
-            description: 'Message created successfully'
           },
-          400: {
-            description: 'Bad request'
+          responses: {
+            200: {
+              description: 'Message created successfully'
+            },
+            400: {
+              description: 'Bad request'
+            }
           }
         }
       },

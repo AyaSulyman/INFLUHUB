@@ -1130,11 +1130,6 @@ router.post('/change-language', authenticateToken, async (req, res) => {
 });
 
 
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('../docs/swagger');
-
-router.get('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 
 
 
