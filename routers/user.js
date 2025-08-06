@@ -461,10 +461,18 @@ router.delete('/industries/:id', async (req, res) => {
 });
 
 
-router.post("/profile-onboarding-submit", async (req, res) => {
+const multer = require("multer");
+const storage = multer.memoryStorage(); // or diskStorage if you want to store to disk
+const upload = multer({ storage });
+
+router.post("/profile-onboarding-submit", upload.single("image"), async (req, res) => {
     try {
+        // Debug log to make sure data is received
+        console.log("🧾 Received req.body:", req.body);
+        console.log("🖼️ Received req.file:", req.file);
+
         const {
-            email, // This is where the error occurs if email is undefined
+            email,
             username: requestedUsername,
             CountryCode,
             PhoneNumber,
@@ -482,7 +490,7 @@ router.post("/profile-onboarding-submit", async (req, res) => {
         }
 
         const user = await User.findOne({ Email: email });
-        if (!user) return res.status(404).json({ error: "User  not found" });
+        if (!user) return res.status(404).json({ error: "User not found" });
 
         const username = requestedUsername || email.split("@")[0];
         user.username = username;
@@ -490,6 +498,7 @@ router.post("/profile-onboarding-submit", async (req, res) => {
         user.PhoneNumber = PhoneNumber;
         user.userType = userType;
 
+        // Handle logic based on userType
         if (userType === "Retailer") {
             if (!Industry || !Degree || typeof isFreelancer === "undefined") {
                 return res.status(400).json({
@@ -499,7 +508,7 @@ router.post("/profile-onboarding-submit", async (req, res) => {
 
             user.Industry = Industry;
             user.Degree = Degree;
-            user.isFreelancer = isFreelancer;
+            user.isFreelancer = isFreelancer === 'true'; // Convert from string to boolean
 
             user.Type = undefined;
             user.Capital = undefined;
@@ -515,7 +524,7 @@ router.post("/profile-onboarding-submit", async (req, res) => {
             user.Industry = Industry;
             user.Type = Type;
             user.Capital = Capital;
-            user.DigitalPresence = DigitalPresence;
+            user.DigitalPresence = DigitalPresence === 'true'; // Convert from string to boolean
 
             user.Degree = undefined;
             user.isFreelancer = undefined;
@@ -526,17 +535,16 @@ router.post("/profile-onboarding-submit", async (req, res) => {
             });
         }
 
+        // If needed, you can also handle the image file here (req.file)
+
         await user.save();
         res.status(200).json({ message: "Profile updated", data: user });
 
     } catch (err) {
-        console.error(err);
+        console.error("❌ Backend Error:", err);
         res.status(500).json({ error: err.message });
     }
 });
-
-
-
 
 
 router.post('/check-username', async (req, res) => {
@@ -965,11 +973,6 @@ router.post('/supplier/competitors', async (req, res) => {
 });
 
 
-//Profile Route
-const multer = require("multer");
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
 
 router.post("/updating-profile", upload.single("image"), async (req, res) => {
