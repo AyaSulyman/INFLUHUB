@@ -49,14 +49,27 @@ module.exports = {
                 }
               }
             }
-          }
-        },
-        responses: {
-          200: {
-            description: 'Message created successfully'
           },
-          400: {
-            description: 'Bad request'
+          responses: {
+            200: {
+              description: 'Message created successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      _id: { type: 'string', example: '60d5ec49f1b2c8b1f8e4e1a1' },
+                      content: { type: 'string', example: 'Hello, this is a message.' },
+                      createdAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' },
+                      updatedAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' }
+                    }
+                  }
+                }
+              }
+            },
+            400: {
+              description: 'Bad request'
+            }
           }
         }
       },
@@ -65,7 +78,23 @@ module.exports = {
         summary: 'Get all messages',
         responses: {
           200: {
-            description: 'List of all messages'
+            description: 'List of all messages',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      _id: { type: 'string', example: '60d5ec49f1b2c8b1f8e4e1a1' },
+                      content: { type: 'string', example: 'Hello, this is a message.' },
+                      createdAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' },
+                      updatedAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' }
+                    }
+                  }
+                }
+              }
+            }
           },
           400: {
             description: 'Bad request'
@@ -106,7 +135,17 @@ module.exports = {
           },
           responses: {
             201: {
-              description: 'User  registered successfully, OTP sent to email'
+              description: 'User  registered successfully, OTP sent to email',
+              content: {
+                'application/json': {
+                  schema: {
+                    type:                    'object',
+                    properties: {
+                      message: { type: 'string', example: 'OTP sent to your email for verification' }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'Invalid input or email already exists'
@@ -188,7 +227,17 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'OTP has been resent to your email'
+              description: 'OTP has been resent to your email',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'OTP has been resent to your email' }
+                    }
+                  }
+                }
+              }
             },
             404: {
               description: 'User  not found'
@@ -285,7 +334,18 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Profile updated successfully'
+              description: 'Profile updated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Profile updated' },
+                      data: { type: 'object' } // Include user data structure if needed
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'All required fields must be filled'
@@ -321,7 +381,17 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Username is available'
+              description: 'Username is available',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Username is available' }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'Username is required or already exists'
@@ -375,7 +445,17 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Industries updated successfully'
+              description: 'Industries updated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Industries updated successfully' }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'Invalid data format for industries'
@@ -427,7 +507,17 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Capitals updated successfully'
+              description: 'Capitals updated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Capitals updated successfully' }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'Invalid data format for capitals'
@@ -479,7 +569,17 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Degrees updated successfully'
+              description: 'Degrees updated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Degrees updated successfully' }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'Invalid data format for degrees'
@@ -512,7 +612,27 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'List of suppliers based on industry'
+              description: 'List of suppliers based on industry',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      suppliers: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string' },
+                            name: { type: 'string' },
+                            image: { type: 'string' }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'userId is required'
@@ -551,7 +671,20 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Retailer dashboard data'
+              description: 'Retailer dashboard data',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      featured: { type: 'array', items: { type: 'object' } },
+                      hotPicks: { type: 'array', items: { type: 'object' } },
+                      lastChance: { type: 'array', items: { type: 'object' } },
+                      competitors: { type: 'array', items: { type: 'object' } }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'User  Id is required'
@@ -587,7 +720,19 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Supplier dashboard data'
+              description: 'Supplier dashboard data',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      featured: { type: 'array', items: { type: 'object' } },
+                      lowInStock: { type: 'array', items: { type: 'object' } },
+                      competitors: { type: 'array', items: { type: 'object' } }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'User  Id is required'
@@ -631,7 +776,18 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Profile updated successfully'
+              description: 'Profile updated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Profile updated successfully' },
+                      data: { type: 'object' } // Include user data structure if needed
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'User  ID is required or image file is missing'
@@ -672,7 +828,17 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Password changed successfully'
+              description: 'Password changed successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      message: { type: 'string', example: 'Password changed successfully' }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'Both old and new passwords are required'
@@ -715,7 +881,19 @@ module.exports = {
           },
           responses: {
             201: {
-              description: 'Address added successfully'
+              description: 'Address added successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      success: { type: 'boolean', example: true },
+                      message: { type: 'string', example: 'Address added successfully.' },
+                      data: { type: 'object' } // Include address data structure if needed
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'Validation failed'
@@ -795,8 +973,20 @@ module.exports = {
             }
           },
           responses: {
-             200: {
-              description: 'Address updated successfully'
+            200: {
+              description: 'Address updated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      success: { type: 'boolean', example: true },
+                      message: { type: 'string', example: 'Address updated successfully' },
+                      data: { type: 'object' } // Include updated address data structure if needed
+                    }
+                  }
+                }
+              }
             },
             404: {
               description: 'Address not found'
@@ -823,7 +1013,18 @@ module.exports = {
         ],
         responses: {
           200: {
-            description: 'Address deleted successfully'
+            description: 'Address deleted successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    message: { type: 'string', example: 'Address deleted successfully' }
+                  }
+                }
+              }
+            }
           },
           404: {
             description: 'Address not found'
@@ -857,7 +1058,20 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'Language updated successfully'
+              description: 'Language updated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      success: { type: 'boolean', example: true },
+                      message: { type: 'string', example: 'Language updated successfully.' },
+                      _id: { type: 'string' },
+                      language: { type: 'string' }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'Invalid language code'
@@ -872,7 +1086,6 @@ module.exports = {
         }
       }
     },
-
     '/retailer/competitors': {
       post: {
         tags: ['Dashboard'],
@@ -894,7 +1107,22 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'List of competitors for retailers'
+              description: 'List of competitors for retailers',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        name: { type: 'string' },
+                        image: { type: 'string' }
+                      }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'User  ID is required'
@@ -909,7 +1137,6 @@ module.exports = {
         }
       }
     },
-
     '/supplier/competitors': {
       post: {
         tags: ['Dashboard'],
@@ -931,7 +1158,22 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'List of competitors for suppliers'
+              description: 'List of competitors for suppliers',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        name: { type: 'string' },
+                        image: { type: 'string' }
+                      }
+                    }
+                  }
+                }
+              }
             },
             400: {
               description: 'User  ID is required'
@@ -948,12 +1190,23 @@ module.exports = {
     },
     '/delete': {
       delete: {
-        tags: ['User '],
+        tags: ['User  '],
         summary: 'Delete user account and related data',
         security: [{ bearerAuth: [] }],
         responses: {
           200: {
-            description: 'Account deleted successfully'
+            description: 'Account deleted successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    message: { type: 'string', example: 'Account deleted successfully.' }
+                  }
+                }
+              }
+            }
           },
           500: {
             description: 'An error occurred while deleting the account'
@@ -961,7 +1214,6 @@ module.exports = {
         }
       }
     },
-
     '/getAllLowInStockSuppliers': {
       get: {
         tags: ['Suppliers'],
@@ -978,10 +1230,25 @@ module.exports = {
         ],
         responses: {
           200: {
-            description: 'List of low in stock suppliers'
+            description: 'List of low in stock suppliers',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string' },
+                      name: { type: 'string' },
+                      image: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
           },
           400: {
-            description: 'User ID is required or not found'
+            description: 'User  ID is required or not found'
           },
           403: {
             description: 'Access denied'
@@ -992,7 +1259,6 @@ module.exports = {
         }
       }
     },
-
     '/retailer/featured-suppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1008,14 +1274,36 @@ module.exports = {
           }
         ],
         responses: {
-          200: { description: 'Featured suppliers retrieved' },
-          400: { description: 'User ID required' },
-          403: { description: 'Access denied' },
-          500: { description: 'Unable to find featured suppliers' }
+          200: {
+            description: 'Featured suppliers retrieved',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string' },
+                      name: { type: 'string' },
+                      image: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          400: {
+            description: 'User  ID required'
+          },
+          403: {
+            description: 'Access denied'
+          },
+          500: {
+            description: 'Unable to find featured suppliers'
+          }
         }
       }
     },
-
     '/supplier/featured-suppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1031,14 +1319,36 @@ module.exports = {
           }
         ],
         responses: {
-          200: { description: 'Featured suppliers retrieved' },
-          400: { description: 'User ID required' },
-          403: { description: 'Access denied' },
-          500: { description: 'Unable to find featured suppliers' }
+          200: {
+            description: 'Featured suppliers retrieved',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string' },
+                      name: { type: 'string' },
+                      image: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          400: {
+            description: 'User  ID required'
+          },
+          403: {
+            description: 'Access denied'
+          },
+          500: {
+            description: 'Unable to find featured suppliers'
+          }
         }
       }
     },
-
     '/getAllHotPickedSuppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1054,14 +1364,36 @@ module.exports = {
           }
         ],
         responses: {
-          200: { description: 'Hot picks retrieved' },
-          400: { description: 'User ID required or not found' },
-          403: { description: 'Access denied' },
-          500: { description: 'Unable to retrieve hot picks' }
+          200: {
+            description: 'Hot picks retrieved',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string' },
+                      name: { type: 'string' },
+                      image: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          400: {
+            description: 'User  ID required or not found'
+          },
+          403: {
+            description: 'Access denied'
+          },
+          500: {
+            description: 'Unable to retrieve hot picks'
+          }
         }
       }
     },
-
     '/getAllLastChanceSuppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1077,16 +1409,95 @@ module.exports = {
           }
         ],
         responses: {
-          200: { description: 'Last chance suppliers retrieved' },
-          400: { description: 'User ID required or not found' },
-          403: { description: 'Access denied' },
-          500: { description: 'Unable to retrieve last chance suppliers' }
+          200: {
+            description: 'Last chance suppliers retrieved',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string' },
+                      name: { type: 'string' },
+                      image: { type: 'string' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          400: {
+            description: 'User  ID required or not found'
+          },
+          403: {
+            description: 'Access denied'
+          },
+          500: {
+            description: 'Unable to retrieve last chance suppliers'
+          }
+        }
+      }
+    },
+    '/social-login': {
+      post: {
+        tags: ['Authentication'],
+        summary: 'Social login for users',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['provider', 'access_token'],
+                properties: {
+                  provider: {
+                    type: 'string',
+                    enum: ['google', 'facebook', 'instagram'],
+                    example: 'google'
+                  },
+                  access_token: {
+                    type: 'string',
+                    example: 'your_access_token_here'
+                  },
+                  email: {
+                    type: 'string',
+                    format: 'email',
+                    example: 'user@example.com'
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            200: {
+              description: 'User  logged in successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      sub: { type: 'string', example: '1234567890' },
+                      name: { type: 'string', example: 'John Doe' },
+                      email: { type: 'string', example: 'user@example.com' },
+                      picture: { type: 'string', example: 'http://example.com/image.jpg' }
+                    }
+                  }
+                }
+              }
+            },
+            400: {
+              description: 'Bad request, missing fields or unsupported provider'
+            },
+            500: {
+              description: 'Internal server error'
+            }
+          }
         }
       }
     }
   },
-
-
+  
   components: {
     securitySchemes: {
       bearerAuth: {
@@ -1096,5 +1507,4 @@ module.exports = {
       }
     }
   }
-
 };
