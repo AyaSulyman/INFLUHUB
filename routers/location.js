@@ -77,4 +77,76 @@ router.post('/addresses', authenticateToken, async (req, res) => {
     }
 });
 
+//Get All addresses
+router.get('/all-addresses', async (req, res) => {
+    try {
+        const addresses = await User.find({});
+        if (addresses.length === 0) {
+            return res.status(404).json({ error: "No addresses found" });
+        } else {
+            return res.status(200).json({ addresses });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: "Service error occurred" });
+    }
+});
+
+//Update address
+router.put('/address/:id', async (req, res) => {
+    try {
+        const { street, city, state, zipCode, country } = req.body;
+        const { id } = req.params;
+
+        const address = await User.findById(id);
+        if (!address) {
+            return res.status(404).json({ 
+                error: "Address not found" 
+            });
+        }
+
+        const updatedAddress = await User.findByIdAndUpdate(
+            id,
+            { street, city, state, zipCode, country },
+            { new: true, runValidators: true }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Address updated successfully",
+            data: updatedAddress
+        });
+    } catch (error) {
+        console.error('Update address error:', error);
+        return res.status(500).json({ 
+            error: "Failed to update address",
+            details: error.message 
+        });
+    }
+});
+
+//delete Address
+router.delete('/address/:id', async (req, res) => {
+    try {
+        const address = await User.findByIdAndDelete(req.params.id);
+        
+        if (!address) {
+            return res.status(404).json({ 
+                error: "Address not found" 
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Address deleted successfully"
+        });
+    } catch (error) {
+        console.error('Delete address error:', error);
+        return res.status(500).json({ 
+            error: "Failed to delete address",
+            details: error.message 
+        });
+    }
+});
+
+
 module.exports = router;
