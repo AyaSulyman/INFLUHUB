@@ -21,7 +21,7 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-//Adress Route
+// Address Route
 router.post('/addresses', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id; 
@@ -77,34 +77,35 @@ router.post('/addresses', authenticateToken, async (req, res) => {
     }
 });
 
-//Get All addresses
-router.get('/all-addresses', async (req, res) => {
+// Get All Addresses
+router.get('/all-addresses', authenticateToken, async (req, res) => {
     try {
-        const addresses = await User.find({});
+        const addresses = await Address.find({}); 
         if (addresses.length === 0) {
             return res.status(404).json({ error: "No addresses found" });
         } else {
             return res.status(200).json({ addresses });
         }
     } catch (error) {
+        console.error('Get all addresses error:', error);
         return res.status(500).json({ error: "Service error occurred" });
     }
 });
 
-//Update address
+// Update Address
 router.put('/address/:id', async (req, res) => {
     try {
         const { street, city, state, zipCode, country } = req.body;
         const { id } = req.params;
 
-        const address = await User.findById(id);
+        const address = await Address.findById(id); 
         if (!address) {
             return res.status(404).json({ 
                 error: "Address not found" 
             });
         }
 
-        const updatedAddress = await User.findByIdAndUpdate(
+        const updatedAddress = await Address.findByIdAndUpdate(
             id,
             { street, city, state, zipCode, country },
             { new: true, runValidators: true }
@@ -124,10 +125,10 @@ router.put('/address/:id', async (req, res) => {
     }
 });
 
-//delete Address
+// Delete Address
 router.delete('/address/:id', async (req, res) => {
     try {
-        const address = await User.findByIdAndDelete(req.params.id);
+        const address = await Address.findByIdAndDelete(req.params.id); 
         
         if (!address) {
             return res.status(404).json({ 
@@ -147,6 +148,5 @@ router.delete('/address/:id', async (req, res) => {
         });
     }
 });
-
 
 module.exports = router;
