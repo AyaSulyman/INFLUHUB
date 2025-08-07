@@ -5,13 +5,13 @@ const bcryptjs = require('bcryptjs');
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
-        require: true,
+        required: true,
         trim: true,
         unique: true
     },
     Email: {
         type: String,
-        require: true,
+        required: true,
         trim: true,
         lowercase: true,
         unique: true,
@@ -23,20 +23,19 @@ const UserSchema = new mongoose.Schema({
     },
     Password: {
         type: String,
-        require: true,
+        required: true,
         trim: true,
         minlength: 8,
         validate(value) {
-            let password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])")
+            let password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])");
             if (!password.test(value)) {
-                throw new Error("password must included uppercase,lowercase,number ,and special characters")
+                throw new Error("password must include uppercase, lowercase, number, and special characters");
             }
         }
     },
-
     ConfirmPassword: {
         type: String,
-        require: true,
+        required: true,
         trim: true,
         minlength: 8,
         validate(val) {
@@ -45,78 +44,78 @@ const UserSchema = new mongoose.Schema({
             }
         }
     },
-
     CountryCode: {
         type: Number,
-        require: true,
+        required: true,
         trim: true,
-
     },
     PhoneNumber: {
         type: Number,
-        require: true,
+        required: true,
         trim: true,
-
-
     },
     userType: {
         type: String,
-        require: true
+        required: true
     },
- 
     Industry: {
         type: String,
-        require: function () {
-            return this.userType === "Supplier" || this.userType === "Retailer"
+        required: function () {
+            return this.userType === "Supplier" || this.userType === "Retailer";
         }
     },
     Degree: {
         type: String,
-        require: function () {
-            return this.userType === "Retailer"
+        required: function () {
+            return this.userType === "Retailer";
         }
     },
-
     Type: {
         type: String,
-        require: function () {
-            return this.userType === "Supplier"
+        required: function () {
+            return this.userType === "Supplier";
         }
     },
-
     Capital: {
         type: String,
-        require: function () {
-            return this.userType === "Supplier"
+        required: function () {
+            return this.userType === "Supplier";
         }
     },
     DigitalPresence: {
         type: String,
-        require: function () {
+        required: function () {
             return this.userType === 'Supplier';
         }
     },
     isFreelancer: {
         type: String,
-        require: function () {
+        required: function () {
             return this.userType === 'Retailer';
         }
     },
     image: {
         type: String, 
-         require: function () {
-            return this.userType === "Supplier" || this.userType === "Retailer"
+        required: function () {
+            return this.userType === "Supplier" || this.userType === "Retailer";
         }
     },
-    language:{
-        type:String,
-        require:true
-    }
-
+    language: {
+        type: String,
+        required: true
+    },
+    provider: {
+        type: String, 
+        default: null
+    },
+    social_id: {
+        type: String, 
+        default: null
+    },
+  
 }, {
     timestamps: true
 });
-
 
 UserSchema.pre("save", async function (next) {
     const user = this;
@@ -132,7 +131,7 @@ UserSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 UserSchema.statics.findByCredentials = async function (email, password) {
-    const user = await this.findOne({ email });
+    const user = await this.findOne({ Email: email });
     if (!user) {
         throw new Error("Unable to login");
     }

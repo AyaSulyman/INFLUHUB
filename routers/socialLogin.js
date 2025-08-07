@@ -113,8 +113,12 @@ router.post('/social-login', async (req, res) => {
 
     } catch (error) {
         console.error("Social login error:", error.response?.data || error.message);
+        if (error.response && error.response.status === 404) {
+            return res.status(404).json({ error: "User  not found on Google. Please check the access token." });
+        }
         return res.status(500).json({ error: "Social login failed" });
     }
 });
+
 
 module.exports = router;
