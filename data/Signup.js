@@ -63,7 +63,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true
     },
- 
+
     Industry: {
         type: String,
         require: function () {
@@ -103,15 +103,19 @@ const UserSchema = new mongoose.Schema({
         }
     },
     image: {
-        type: String, 
-         require: function () {
+        type: String,
+        require: function () {
             return this.userType === "Supplier" || this.userType === "Retailer"
         }
     },
-    language:{
-        type:String,
-        require:true
-    }
+    language: {
+        type: String,
+        require: true
+    },
+    avatar: String,
+    provider: String,
+    providerId: String,
+    
 
 }, {
     timestamps: true
@@ -127,8 +131,8 @@ UserSchema.pre("save", async function (next) {
     next();
 });
 
-UserSchema.methods.comparePassword = async function(candidatePassword) {
-    return await bcryptjs.compare(candidatePassword, this.Password); 
+UserSchema.methods.comparePassword = async function (candidatePassword) {
+    return await bcryptjs.compare(candidatePassword, this.Password);
 };
 
 UserSchema.statics.findByCredentials = async function (email, password) {

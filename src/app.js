@@ -7,12 +7,13 @@ const http = require('http');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
-const loginRoutes = require('../routers/user');
+const userRoutes = require('../routers/user');
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const addressRoutes = require('../routers/location')
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../docs/swagger'); 
+const loginRoutes = require('../routers/socialLogin')
 
 
 
@@ -67,13 +68,16 @@ app.get('/status', verifyRefreshToken, (req, res) => {
 });
 
 
-app.use('/app/dashboard', loginRoutes);
-app.use('/api/authentication', loginRoutes)
-app.use('/api', loginRoutes)
-app.use('/api/user', loginRoutes)
+app.use('/app/dashboard', userRoutes);
+app.use('/api/authentication', userRoutes)
+app.use('/api', userRoutes)
+app.use('/api/user', userRoutes)
 
-
+//address Routes
 app.use('/api/user', addressRoutes)
+
+//Social Login Routes
+app.use('/api/auth',loginRoutes)
 
 const port = process.env.PORT || 3000;
 
