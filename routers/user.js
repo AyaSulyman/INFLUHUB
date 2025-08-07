@@ -462,7 +462,7 @@ router.delete('/industries/:id', async (req, res) => {
 
 
 const multer = require("multer");
-const storage = multer.memoryStorage(); // or diskStorage if you want to store to disk
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.post("/profile-onboarding-submit", upload.single("image"), async (req, res) => {
@@ -508,7 +508,7 @@ router.post("/profile-onboarding-submit", upload.single("image"), async (req, re
 
             user.Industry = Industry;
             user.Degree = Degree;
-            user.isFreelancer = isFreelancer === 'true'; // Convert from string to boolean
+            user.isFreelancer = isFreelancer === 'true';
 
             user.Type = undefined;
             user.Capital = undefined;
@@ -535,7 +535,7 @@ router.post("/profile-onboarding-submit", upload.single("image"), async (req, re
             });
         }
 
-        // If needed, you can also handle the image file here (req.file)
+        
 
         await user.save();
         res.status(200).json({ message: "Profile updated", data: user });

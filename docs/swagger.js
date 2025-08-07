@@ -24,7 +24,8 @@ module.exports = {
     { name: 'User ', description: 'User  management endpoints' },
     { name: 'Messages', description: 'Message handling endpoints' },
     { name: 'Profile', description: 'User  profile management' },
-    { name: 'Dashboard', description: 'Dashboard related endpoints' }
+    { name: 'Dashboard', description: 'Dashboard related endpoints' },
+    { name: 'Addresses', description: 'User  address management' }
   ],
   paths: {
     '/message': {
@@ -682,6 +683,148 @@ module.exports = {
             500: {
               description: 'Internal server error'
             }
+          }
+        }
+      }
+    },
+    '/addresses': {
+      post: {
+        tags: ['Addresses'],
+        summary: 'Add a new address',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  nickname: { type: 'string', example: 'Home' },
+                  street: { type: 'string', example: '123 Main St' },
+                  building: { type: 'string', example: 'Building A' },
+                  apartment: { type: 'string', example: 'Apartment 1' },
+                  phone_number: { type: 'string', example: '+1234567890' },
+                  latitude: { type: 'number', example: 40.7128 },
+                  longitude: { type: 'number', example: -74.0060 }
+                }
+              }
+            }
+          },
+          responses: {
+            201: {
+              description: 'Address added successfully'
+            },
+            400: {
+              description: 'Validation failed'
+            },
+            500: {
+              description: 'An error occurred while adding the address'
+            }
+          }
+        }
+      },
+      get: {
+        tags: ['Addresses'],
+        summary: 'Get all addresses',
+        responses: {
+          200: {
+            description: 'List of addresses',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string' },
+                      nickname: { type: 'string' },
+                      street: { type: 'string' },
+                      building: { type: 'string' },
+                      apartment: { type: 'string' },
+                      phone_number: { type: 'string' },
+                      latitude: { type: 'number' },
+                      longitude: { type: 'number' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'No addresses found'
+          },
+          500: {
+            description: 'Service error occurred'
+          }
+        }
+      }
+    },
+    '/address/{id}': {
+      put: {
+        tags: ['Addresses'],
+        summary: 'Update an address',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID of the address to update',
+            schema: {
+              type: 'string'
+            }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  street: { type: 'string' },
+                  city: { type: 'string' },
+                  state: { type: 'string' },
+                  zipCode: { type: 'string' },
+                  country: { type: 'string' }
+                }
+              }
+            }
+          },
+          responses: {
+            200: {
+              description: 'Address updated successfully'
+            },
+            404: {
+              description: 'Address not found'
+            },
+            500: {
+              description: 'Failed to update address'
+            }
+          }
+        }
+      },
+      delete: {
+        tags: ['Addresses'],
+        summary: 'Delete an address',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID of the address to delete',
+            schema: {
+              type: 'string'
+            }
+          }
+        ],
+        responses: {
+          200: {
+            description: 'Address deleted successfully'
+          },
+          404: {
+            description: 'Address not found'
+          },
+          500: {
+            description: 'Failed to delete address'
           }
         }
       }

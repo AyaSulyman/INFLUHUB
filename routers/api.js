@@ -246,7 +246,7 @@ router.get('/message', (req, res) => {
  *         description: Internal server error
  */
 router.post('/profile-onboarding-submit', async (req, res) => {
-    // Profile onboarding logic here...
+    
 });
 
 // Additional routes can be added here following the same pattern
