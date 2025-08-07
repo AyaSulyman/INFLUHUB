@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Message = require('../data/data'); // Adjust the path as necessary
-const SignupUser  = require('../data/Signup'); // Adjust the path as necessary
+const Message = require('../data/data');
+const SignupUser  = require('../data/Signup'); 
 const jwt = require('jsonwebtoken');
-const User = require('../data/Signup'); // Adjust the path as necessary
+const User = require('../data/Signup');
 const bcryptjs = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');

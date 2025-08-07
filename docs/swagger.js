@@ -24,8 +24,7 @@ module.exports = {
     { name: 'User ', description: 'User  management endpoints' },
     { name: 'Messages', description: 'Message handling endpoints' },
     { name: 'Profile', description: 'User  profile management' },
-    { name: 'Dashboard', description: 'Dashboard related endpoints' },
-    { name: 'Addresses', description: 'User  address management' }
+    { name: 'Dashboard', description: 'Dashboard related endpoints' }
   ],
   paths: {
     '/message': {
@@ -687,149 +686,117 @@ module.exports = {
         }
       }
     },
-    '/addresses': {
+    '/change-language': {
       post: {
-        tags: ['Addresses'],
-        summary: 'Add a new address',
+        tags: ['Profile'],
+        summary: 'Change user language preference',
         requestBody: {
           required: true,
           content: {
             'application/json': {
               schema: {
                 type: 'object',
+                required: ['language'],
                 properties: {
-                  nickname: { type: 'string', example: 'Home' },
-                  street: { type: 'string', example: '123 Main St' },
-                  building: { type: 'string', example: 'Building A' },
-                  apartment: { type: 'string', example: 'Apartment 1' },
-                  phone_number: { type: 'string', example: '+1234567890' },
-                  latitude: { type: 'number', example: 40.7128 },
-                  longitude: { type: 'number', example: -74.0060 }
-                }
-              }
-            }
-          },
-          responses: {
-            201: {
-              description: 'Address added successfully'
-            },
-            400: {
-              description: 'Validation failed'
-            },
-            500: {
-              description: 'An error occurred while adding the address'
-            }
-          }
-        }
-      },
-      get: {
-        tags: ['Addresses'],
-        summary: 'Get all addresses',
-        responses: {
-          200: {
-            description: 'List of addresses',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      id: { type: 'string' },
-                      nickname: { type: 'string' },
-                      street: { type: 'string' },
-                      building: { type: 'string' },
-                      apartment: { type: 'string' },
-                      phone_number: { type: 'string' },
-                      latitude: { type: 'number' },
-                      longitude: { type: 'number' }
-                    }
+                  language: {
+                    type: 'string',
+                    enum: ['en', 'ar', 'fr'],
+                    example: 'en'
                   }
-                }
-              }
-            }
-          },
-          404: {
-            description: 'No addresses found'
-          },
-          500: {
-            description: 'Service error occurred'
-          }
-        }
-      }
-    },
-    '/address/{id}': {
-      put: {
-        tags: ['Addresses'],
-        summary: 'Update an address',
-        parameters: [
-          {
-            name: 'id',
-            in: 'path',
-            required: true,
-            description: 'ID of the address to update',
-            schema: {
-              type: 'string'
-            }
-          }
-        ],
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  street: { type: 'string' },
-                  city: { type: 'string' },
-                  state: { type: 'string' },
-                  zipCode: { type: 'string' },
-                  country: { type: 'string' }
                 }
               }
             }
           },
           responses: {
             200: {
-              description: 'Address updated successfully'
+              description: 'Language updated successfully'
+            },
+            400: {
+              description: 'Invalid language code'
             },
             404: {
-              description: 'Address not found'
+              description: 'User  not found'
             },
             500: {
-              description: 'Failed to update address'
+              description: 'Internal server error'
             }
-          }
-        }
-      },
-      delete: {
-        tags: ['Addresses'],
-        summary: 'Delete an address',
-        parameters: [
-          {
-            name: 'id',
-            in: 'path',
-            required: true,
-            description: 'ID of the address to delete',
-            schema: {
-              type: 'string'
-            }
-          }
-        ],
-        responses: {
-          200: {
-            description: 'Address deleted successfully'
-          },
-          404: {
-            description: 'Address not found'
-          },
-          500: {
-            description: 'Failed to delete address'
           }
         }
       }
-    }
-  },
+    },
+      '/retailer/competitors': {
+      post: {
+        tags: ['Dashboard'],
+        summary: 'Get competitors for retailers',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  userId: {
+                    type: 'string',
+                    example: 'userId123'
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            200: {
+              description: 'List of competitors for retailers'
+            },
+            400: {
+              description: 'User  ID is required'
+            },
+            403: {
+              description: 'Access denied'
+            },
+            500: {
+              description: 'Internal server error'
+            }
+          }
+        }
+      }
+    },
+  '/supplier/competitors': {
+      post: {
+        tags: ['Dashboard'],
+        summary: 'Get competitors for suppliers',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  userId: {
+                    type: 'string',
+                    example: 'userId123'
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            200: {
+              description: 'List of competitors for suppliers'
+            },
+            400: {
+              description: 'User  ID is required'
+            },
+            403: {
+              description: 'Access denied'
+            },
+            500: {
+              description: 'Internal server error'
+            }
+          }
+        }
+      }
+    },
+
   components: {
     securitySchemes: {
       bearerAuth: {
@@ -839,4 +806,5 @@ module.exports = {
       }
     }
   }
-};
+}
+  };
