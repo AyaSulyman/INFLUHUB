@@ -21,116 +21,121 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// Social login route
+// Social login
 router.post('/social-login', async (req, res) => {
-  try {
-    const { provider, access_token, email: manualEmail } = req.body;
+    try {
+        const { provider, access_token, email: manualEmail } = req.body;
 
-    if (!provider || !access_token) {
-      return res.status(400).json({ error: "All fields are required" });
+        if (!provider || !access_token) {
+            return res.status(400).json({ error: "All fields are required" });
+        }
+
+        const validProviders = ['google', 'facebook', 'instagram'];
+        if (!validProviders.includes(provider)) {
+            return res.status(400).json({ error: "Unsupported provider" });
+        }
+
+        let userData;
+        let dbUserData = {
+            Password: 'sociallogin',
+            ConfirmPassword: 'sociallogin',
+            CountryCode: 0,
+            PhoneNumber: 0,
+            userType: 'social',
+            language: 'en'
+        };
+
+        if (provider === 'google') {
+            const { data } = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${access_token}` }
+            });
+
+            userData = {
+                sub: data.sub,
+                name: data.name,
+                email: data.email,
+                picture: data.picture
+            };
+
+            dbUserData = {
+                ...dbUserData,
+                providerId: data.sub,
+                Email: data.email,
+                username: data.name,
+                avatar: data.picture,
+                provider: 'google'
+            };
+        }
+
+        else if (provider === 'facebook') {
+            const { data } = await axios.get(`https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${access_token}`);
+
+            if (!data.email && !manualEmail) {
+                return res.status(400).json({
+                    error: "Facebook email not found. Please provide manually.",
+                    needManualEmail: true
+                });
+            }
+
+            userData = {
+                id: data.id,
+                name: data.name,
+                email: data.email || manualEmail
+            };
+
+            dbUserData = {
+                ...dbUserData,
+                providerId: data.id,
+                Email: data.email || manualEmail,
+                username: data.name,
+                avatar: data.picture?.data?.url || '',
+                provider: 'facebook'
+            };
+        }
+
+        else if (provider === 'instagram') {
+            const { data } = await axios.get(`https://graph.instagram.com/me?fields=id,username,account_type&access_token=${access_token}`);
+
+            if (!manualEmail) {
+                return res.status(400).json({ error: "Instagram requires email manually" });
+            }
+
+            userData = {
+                id: data.id,
+                username: data.username,
+                account_type: data.account_type
+            };
+
+            dbUserData = {
+                ...dbUserData,
+                providerId: data.id,
+                Email: manualEmail,
+                username: data.username,
+                avatar: '',
+                provider: 'instagram'
+            };
+        }
+
+        // Save or retrieve user
+        if (dbUserData.Email) {
+            let user = await User.findOne({ Email: dbUserData.Email });
+
+            if (!user) {
+                user = new User(dbUserData);
+                await user.save();
+            }
+
+            const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+            
+        }
+
+        
+        return res.status(200).json(userData);
+
+    } catch (error) {
+        console.error("Social login error:", error.response?.data || error.message);
+        return res.status(500).json({ error: "Social login failed" });
     }
-
-    const validProviders = ['google', 'facebook', 'instagram'];
-    if (!validProviders.includes(provider)) {
-      return res.status(400).json({ error: "Provider is not supported" });
-    }
-
-    let userData;
-
-    if (provider === 'google') {
-      const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: `Bearer ${access_token}` }
-      });
-      const data = response.data;
-      userData = {
-        providerId: data.sub,
-        email: data.email,
-        name: data.name,
-        avatar: data.picture,
-        provider: 'google'
-      };
-    } else if (provider === 'facebook') {
-      const response = await axios.get(`https://graph.facebook.com/me?fields=id,name,email&access_token=${access_token}`);
-      const data = response.data;
-
-      if (!data.email && !manualEmail) {
-        // Email missing and no manual email provided - ask frontend to prompt user
-        return res.status(400).json({ 
-          error: "Email not available from Facebook. Please provide an email manually.",
-          needManualEmail: true 
-        });
-      }
-
-      userData = {
-        providerId: data.id,
-        email: data.email || manualEmail,  // fallback to manualEmail if missing
-        name: data.name,
-        avatar: '',
-        provider: 'facebook'
-      };
-    } else if (provider === 'instagram') {
-      const response = await axios.get(`https://graph.instagram.com/me?fields=id,username,account_type&access_token=${access_token}`);
-      const data = response.data;
-
-      if (!manualEmail) {
-        return res.status(400).json({ error: "Instagram does not provide email. Please provide one." });
-      }
-
-      userData = {
-        providerId: data.id,
-        email: manualEmail,
-        name: data.username,
-        avatar: '',
-        provider: 'instagram'
-      };
-    }
-
-    if (!userData || !userData.email) {
-      return res.status(400).json({ error: "Failed to retrieve user email." });
-    }
-
-    // Now proceed to find or create user with the email we have
-    let user = await User.findOne({ Email: userData.email });
-
-    if (!user) {
-      user = new User({
-        username: userData.name,
-        Email: userData.email,
-        avatar: userData.avatar,
-        provider: userData.provider,
-        providerId: userData.providerId,
-        Password: 'sociallogin',
-        ConfirmPassword: 'sociallogin',
-        CountryCode: 0,
-        PhoneNumber: 0,
-        userType: 'social',
-        language: 'en'
-      });
-
-      await user.save();
-    }
-
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
-
-    return res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.Email,
-        avatar: user.avatar
-      }
-    });
-
-  } catch (error) {
-    console.error("Social login error:", error.response?.data || error.message);
-    if (error.response && error.response.status === 404) {
-      return res.status(404).json({ error: "User not found on provider. Please check the access token." });
-    }
-    return res.status(500).json({ error: "Social login failed" });
-  }
 });
-
 
 module.exports = router;
