@@ -945,9 +945,148 @@ module.exports = {
           }
         }
       }
+    },
+    '/delete': {
+      delete: {
+        tags: ['User '],
+        summary: 'Delete user account and related data',
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Account deleted successfully'
+          },
+          500: {
+            description: 'An error occurred while deleting the account'
+          }
+        }
+      }
+    },
+
+    '/getAllLowInStockSuppliers': {
+      get: {
+        tags: ['Suppliers'],
+        summary: 'Get all low in stock suppliers (for suppliers only)',
+        parameters: [
+          {
+            name: 'user-id',
+            in: 'header',
+            required: true,
+            schema: {
+              type: 'string'
+            }
+          }
+        ],
+        responses: {
+          200: {
+            description: 'List of low in stock suppliers'
+          },
+          400: {
+            description: 'User ID is required or not found'
+          },
+          403: {
+            description: 'Access denied'
+          },
+          500: {
+            description: 'Unable to find low in stock suppliers'
+          }
+        }
+      }
+    },
+
+    '/retailer/featured-suppliers': {
+      get: {
+        tags: ['Suppliers'],
+        summary: 'Get featured suppliers (for retailers only)',
+        parameters: [
+          {
+            name: 'user-id',
+            in: 'header',
+            required: true,
+            schema: {
+              type: 'string'
+            }
+          }
+        ],
+        responses: {
+          200: { description: 'Featured suppliers retrieved' },
+          400: { description: 'User ID required' },
+          403: { description: 'Access denied' },
+          500: { description: 'Unable to find featured suppliers' }
+        }
+      }
+    },
+
+    '/supplier/featured-suppliers': {
+      get: {
+        tags: ['Suppliers'],
+        summary: 'Get featured suppliers (for suppliers only)',
+        parameters: [
+          {
+            name: 'user-id',
+            in: 'header',
+            required: true,
+            schema: {
+              type: 'string'
+            }
+          }
+        ],
+        responses: {
+          200: { description: 'Featured suppliers retrieved' },
+          400: { description: 'User ID required' },
+          403: { description: 'Access denied' },
+          500: { description: 'Unable to find featured suppliers' }
+        }
+      }
+    },
+
+    '/getAllHotPickedSuppliers': {
+      get: {
+        tags: ['Suppliers'],
+        summary: 'Get hot picked suppliers (for retailers only)',
+        parameters: [
+          {
+            name: 'user-id',
+            in: 'header',
+            required: true,
+            schema: {
+              type: 'string'
+            }
+          }
+        ],
+        responses: {
+          200: { description: 'Hot picks retrieved' },
+          400: { description: 'User ID required or not found' },
+          403: { description: 'Access denied' },
+          500: { description: 'Unable to retrieve hot picks' }
+        }
+      }
+    },
+
+    '/getAllLastChanceSuppliers': {
+      get: {
+        tags: ['Suppliers'],
+        summary: 'Get last chance suppliers (for retailers only)',
+        parameters: [
+          {
+            name: 'user-id',
+            in: 'header',
+            required: true,
+            schema: {
+              type: 'string'
+            }
+          }
+        ],
+        responses: {
+          200: { description: 'Last chance suppliers retrieved' },
+          400: { description: 'User ID required or not found' },
+          403: { description: 'Access denied' },
+          500: { description: 'Unable to retrieve last chance suppliers' }
+        }
+      }
     }
- 
   },
+
+
   components: {
     securitySchemes: {
       bearerAuth: {
