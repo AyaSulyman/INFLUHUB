@@ -1,30 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const Address = require('../data/address'); 
+const Address = require('../data/address');
 const jwt = require('jsonwebtoken');
-const User = require('../data/Signup'); 
+const User = require('../data/Signup');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware to authenticate access tokens
 const authenticateToken = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-        return res.sendStatus(401);
-    }
+    if (!token) return res.sendStatus(401);
+
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.sendStatus(403);
-        }
-        req.user = user;
+        if (err) return res.sendStatus(403);
+        req.user = user; 
         next();
     });
 };
 
-// Address Route
+
 router.post('/addresses', authenticateToken, async (req, res) => {
     try {
-        const userId = req.user.id; 
+        const userId = req.user.id;
         const { nickname, street, building, apartment, phone_number, latitude, longitude } = req.body;
 
         const errors = {};
@@ -38,11 +35,17 @@ router.post('/addresses', authenticateToken, async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Validation failed.",
-                errors: errors
+                errors
             });
         }
 
-        const existingAddress = await Address.findOne({ user_id: userId, nickname, street, phone_number });
+        const existingAddress = await Address.findOne({
+            user_id: userId,
+            nickname,
+            street,
+            phone_number
+        });
+
         if (existingAddress) {
             return res.status(400).json({
                 success: false,
@@ -61,13 +64,14 @@ router.post('/addresses', authenticateToken, async (req, res) => {
             longitude
         });
 
-        await newAddress.save(); 
+        await newAddress.save();
 
         return res.status(201).json({
             success: true,
             message: "Address added successfully.",
             data: newAddress
         });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({
@@ -77,15 +81,25 @@ router.post('/addresses', authenticateToken, async (req, res) => {
     }
 });
 
-// Get All Addresses
+
 router.get('/all-addresses', authenticateToken, async (req, res) => {
     try {
-        const addresses = await Address.find({}); 
+        const { id, role } = req.user;
+
+        let addresses;
+
+        if (role === 'Admin') {
+            addresses = await Address.find({});
+        } else {
+            addresses = await Address.find({ user_id: id });
+        }
+
         if (addresses.length === 0) {
             return res.status(404).json({ error: "No addresses found" });
-        } else {
-            return res.status(200).json({ addresses });
         }
+
+        return res.status(200).json({ addresses });
+
     } catch (error) {
         console.error('Get all addresses error:', error);
         return res.status(500).json({ error: "Service error occurred" });
@@ -93,16 +107,19 @@ router.get('/all-addresses', authenticateToken, async (req, res) => {
 });
 
 // Update Address
-router.put('/address/:id', async (req, res) => {
+router.put('/address/:id', authenticateToken, async (req, res) => {
     try {
         const { street, city, state, zipCode, country } = req.body;
         const { id } = req.params;
 
-        const address = await Address.findById(id); 
+        const address = await Address.findById(id);
         if (!address) {
-            return res.status(404).json({ 
-                error: "Address not found" 
-            });
+            return res.status(404).json({ error: "Address not found" });
+        }
+
+
+        if (req.user.role !== 'Admin' && String(address.user_id) !== req.user.id) {
+            return res.status(403).json({ error: "Not authorized to update this address." });
         }
 
         const updatedAddress = await Address.findByIdAndUpdate(
@@ -116,35 +133,40 @@ router.put('/address/:id', async (req, res) => {
             message: "Address updated successfully",
             data: updatedAddress
         });
+
     } catch (error) {
         console.error('Update address error:', error);
-        return res.status(500).json({ 
+        return res.status(500).json({
             error: "Failed to update address",
-            details: error.message 
+            details: error.message
         });
     }
 });
 
 // Delete Address
-router.delete('/address/:id', async (req, res) => {
+router.delete('/address/:id', authenticateToken, async (req, res) => {
     try {
-        const address = await Address.findByIdAndDelete(req.params.id); 
-        
+        const address = await Address.findById(req.params.id);
         if (!address) {
-            return res.status(404).json({ 
-                error: "Address not found" 
-            });
+            return res.status(404).json({ error: "Address not found" });
         }
+
+        if (req.user.role !== 'Admin' && String(address.user_id) !== req.user.id) {
+            return res.status(403).json({ error: "Not authorized to delete this address." });
+        }
+
+        await address.deleteOne();
 
         return res.status(200).json({
             success: true,
             message: "Address deleted successfully"
         });
+
     } catch (error) {
         console.error('Delete address error:', error);
-        return res.status(500).json({ 
+        return res.status(500).json({
             error: "Failed to delete address",
-            details: error.message 
+            details: error.message
         });
     }
 });
