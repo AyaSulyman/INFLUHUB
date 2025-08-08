@@ -139,9 +139,19 @@ module.exports = {
               content: {
                 'application/json': {
                   schema: {
-                    type:'object',
+                    type: 'object',
                     properties: {
-                      message: { type: 'string', example: 'OTP sent to your email for verification' }
+                      message: { type: 'string', example: 'OTP sent to your email for verification' },
+                      user: {
+                        type: 'object',
+                        properties: {
+                          _id: { type: 'string', example: '60d5ec49f1b2c8b1f8e4e1a1' },
+                          Email: { type: 'string', example: 'user@example.com' },
+                          username: { type: 'string', example: 'user123' },
+                          createdAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' },
+                          updatedAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' }
+                        }
+                      }
                     }
                   }
                 }
@@ -154,6 +164,8 @@ module.exports = {
         }
       }
     },
+
+
     '/verify-otp': {
       post: {
         tags: ['Authentication'],
@@ -1497,7 +1509,7 @@ module.exports = {
       }
     }
   },
-  
+
   components: {
     securitySchemes: {
       bearerAuth: {
