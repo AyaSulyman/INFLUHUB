@@ -48,8 +48,8 @@ module.exports = {
                   }
                 }
               }
-            }
-          },
+            },
+        
           responses: {
             200: {
               description: 'Message created successfully',
@@ -67,12 +67,14 @@ module.exports = {
                 }
               }
             },
+            
             400: {
               description: 'Bad request'
             }
           }
         }
-      },
+      }
+        },
       get: {
         tags: ['Messages'],
         summary: 'Get all messages',
@@ -102,7 +104,6 @@ module.exports = {
         }
       }
     },
-    
     '/signup': {
       post: {
         tags: ['Authentication'],
@@ -135,27 +136,11 @@ module.exports = {
             }
           },
           responses: {
-            201: {
-              description: 'User  registered successfully, OTP sent to email',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      message: { type: 'string', example: 'OTP sent to your email for verification' }
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'Invalid input or email already exists'
-            }
+           
           }
         }
       }
     },
-    
     '/verify-otp': {
       post: {
         tags: ['Authentication'],
@@ -208,7 +193,6 @@ module.exports = {
         }
       }
     },
-    
     '/resend-otp': {
       post: {
         tags: ['Authentication'],
@@ -252,7 +236,6 @@ module.exports = {
         }
       }
     },
-    
     '/login': {
       post: {
         tags: ['Authentication'],
@@ -309,7 +292,6 @@ module.exports = {
         }
       }
     },
-    
     '/profile-onboarding-submit': {
       post: {
         tags: ['Profile'],
@@ -365,7 +347,6 @@ module.exports = {
         }
       }
     },
-    
     '/check-username': {
       post: {
         tags: ['User '],
@@ -406,7 +387,6 @@ module.exports = {
         }
       }
     },
-    
     '/industries': {
       get: {
         tags: ['Profile'],
@@ -474,7 +454,6 @@ module.exports = {
         }
       }
     },
-    
     '/capitals': {
       get: {
         tags: ['Profile'],
@@ -537,7 +516,6 @@ module.exports = {
         }
       }
     },
-    
     '/degrees': {
       get: {
         tags: ['Profile'],
@@ -600,7 +578,6 @@ module.exports = {
         }
       }
     },
-    
     '/supplier-service': {
       post: {
         tags: ['Dashboard'],
@@ -660,7 +637,6 @@ module.exports = {
         }
       }
     },
-    
     '/retailer/dashboard': {
       post: {
         tags: ['Dashboard'],
@@ -710,7 +686,6 @@ module.exports = {
         }
       }
     },
-    
     '/supplier/dashboard': {
       post: {
         tags: ['Dashboard'],
@@ -759,7 +734,6 @@ module.exports = {
         }
       }
     },
-    
     '/updating-profile': {
       post: {
         tags: ['Profile'],
@@ -767,7 +741,7 @@ module.exports = {
         requestBody: {
           required: true,
           content: {
-                        'multipart/form-data': {
+            'multipart/form-data': {
               schema: {
                 type: 'object',
                 properties: {
@@ -803,10 +777,10 @@ module.exports = {
               }
             },
             400: {
-              description: 'User   ID is required or image file is missing'
+              description: 'User  ID is required or image file is missing'
             },
             404: {
-              description: 'User   not found'
+              description: 'User  not found'
             },
             500: {
               description: 'Internal server error'
@@ -815,7 +789,6 @@ module.exports = {
         }
       }
     },
-    
     '/change-password': {
       post: {
         tags: ['Authentication'],
@@ -861,7 +834,7 @@ module.exports = {
               description: 'Old password is incorrect'
             },
             404: {
-              description: 'User   not found'
+              description: 'User  not found'
             },
             500: {
               description: 'Internal server error'
@@ -870,7 +843,6 @@ module.exports = {
         }
       }
     },
-    
     '/addresses': {
       post: {
         tags: ['Address'],
@@ -920,7 +892,6 @@ module.exports = {
         }
       }
     },
-    
     '/all-addresses': {
       get: {
         tags: ['Address'],
@@ -957,7 +928,6 @@ module.exports = {
         }
       }
     },
-    
     '/address/{id}': {
       put: {
         tags: ['Address'],
@@ -1052,7 +1022,6 @@ module.exports = {
         }
       }
     },
-    
     '/change-language': {
       post: {
         tags: ['Profile'],
@@ -1095,7 +1064,7 @@ module.exports = {
               description: 'Invalid language code'
             },
             404: {
-              description: 'User   not found'
+              description: 'User  not found'
             },
             500: {
               description: 'Internal server error'
@@ -1104,7 +1073,6 @@ module.exports = {
         }
       }
     },
-    
     '/retailer/competitors': {
       post: {
         tags: ['Dashboard'],
@@ -1144,7 +1112,7 @@ module.exports = {
               }
             },
             400: {
-              description: 'User   ID is required'
+              description: 'User  ID is required'
             },
             403: {
               description: 'Access denied'
@@ -1156,7 +1124,6 @@ module.exports = {
         }
       }
     },
-    
     '/supplier/competitors': {
       post: {
         tags: ['Dashboard'],
@@ -1196,7 +1163,7 @@ module.exports = {
               }
             },
             400: {
-              description: 'User   ID is required'
+              description: 'User  ID is required'
             },
             403: {
               description: 'Access denied'
@@ -1208,7 +1175,6 @@ module.exports = {
         }
       }
     },
-    
     '/delete': {
       delete: {
         tags: ['User  '],
@@ -1235,7 +1201,6 @@ module.exports = {
         }
       }
     },
-    
     '/getAllLowInStockSuppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1270,7 +1235,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User   ID is required or not found'
+            description: 'User  ID is required or not found'
           },
           403: {
             description: 'Access denied'
@@ -1281,7 +1246,6 @@ module.exports = {
         }
       }
     },
-    
     '/retailer/featured-suppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1316,7 +1280,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User   ID required'
+            description: 'User  ID required'
           },
           403: {
             description: 'Access denied'
@@ -1327,7 +1291,6 @@ module.exports = {
         }
       }
     },
-    
     '/supplier/featured-suppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1362,7 +1325,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User   ID required'
+            description: 'User  ID required'
           },
           403: {
             description: 'Access denied'
@@ -1373,7 +1336,6 @@ module.exports = {
         }
       }
     },
-    
     '/getAllHotPickedSuppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1408,7 +1370,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User   ID required or not found'
+            description: 'User  ID required or not found'
           },
           403: {
             description: 'Access denied'
@@ -1419,7 +1381,6 @@ module.exports = {
         }
       }
     },
-    
     '/getAllLastChanceSuppliers': {
       get: {
         tags: ['Suppliers'],
@@ -1454,7 +1415,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User   ID required or not found'
+            description: 'User  ID required or not found'
           },
           403: {
             description: 'Access denied'
@@ -1465,7 +1426,6 @@ module.exports = {
         }
       }
     },
-    
     '/social-login': {
       post: {
         tags: ['Authentication'],
@@ -1498,7 +1458,7 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'User   logged in successfully',
+              description: 'User  logged in successfully',
               content: {
                 'application/json': {
                   schema: {
