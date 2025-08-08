@@ -750,7 +750,8 @@ module.exports = {
               description: 'User  Id is required'
             },
             403: {
-              description: 'Access denied',
+              description: 'Access denied'
+            },
             500: {
               description: 'Internal server error'
             }
@@ -766,7 +767,7 @@ module.exports = {
         requestBody: {
           required: true,
           content: {
-            'multipart/form-data': {
+                        'multipart/form-data': {
               schema: {
                 type: 'object',
                 properties: {
@@ -802,10 +803,10 @@ module.exports = {
               }
             },
             400: {
-              description: 'User  ID is required or image file is missing'
+              description: 'User   ID is required or image file is missing'
             },
             404: {
-              description: 'User  not found'
+              description: 'User   not found'
             },
             500: {
               description: 'Internal server error'
@@ -860,7 +861,7 @@ module.exports = {
               description: 'Old password is incorrect'
             },
             404: {
-              description: 'User  not found'
+              description: 'User   not found'
             },
             500: {
               description: 'Internal server error'
@@ -1094,7 +1095,7 @@ module.exports = {
               description: 'Invalid language code'
             },
             404: {
-              description: 'User  not found'
+              description: 'User   not found'
             },
             500: {
               description: 'Internal server error'
@@ -1143,7 +1144,7 @@ module.exports = {
               }
             },
             400: {
-              description: 'User  ID is required'
+              description: 'User   ID is required'
             },
             403: {
               description: 'Access denied'
@@ -1195,7 +1196,7 @@ module.exports = {
               }
             },
             400: {
-              description: 'User  ID is required'
+              description: 'User   ID is required'
             },
             403: {
               description: 'Access denied'
@@ -1210,7 +1211,7 @@ module.exports = {
     
     '/delete': {
       delete: {
-        tags: ['User   '],
+        tags: ['User  '],
         summary: 'Delete user account and related data',
         security: [{ bearerAuth: [] }],
         responses: {
@@ -1269,7 +1270,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User  ID is required or not found'
+            description: 'User   ID is required or not found'
           },
           403: {
             description: 'Access denied'
@@ -1315,7 +1316,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User  ID required'
+            description: 'User   ID required'
           },
           403: {
             description: 'Access denied'
@@ -1361,7 +1362,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User  ID required'
+            description: 'User   ID required'
           },
           403: {
             description: 'Access denied'
@@ -1407,7 +1408,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User  ID required'
+            description: 'User   ID required or not found'
           },
           403: {
             description: 'Access denied'
@@ -1453,7 +1454,7 @@ module.exports = {
             }
           },
           400: {
-            description: 'User  ID required'
+            description: 'User   ID required or not found'
           },
           403: {
             description: 'Access denied'
@@ -1497,7 +1498,7 @@ module.exports = {
           },
           responses: {
             200: {
-              description: 'User  logged in successfully',
+              description: 'User   logged in successfully',
               content: {
                 'application/json': {
                   schema: {
@@ -1533,5 +1534,4 @@ module.exports = {
       }
     }
   }
-}
-}
+};
