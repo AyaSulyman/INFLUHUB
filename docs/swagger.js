@@ -500,320 +500,264 @@ module.exports = {
         }
       }
     },
-    '/supplier-service': {
-      post: {
-        tags: ['Dashboard'],
-        summary: 'Get suppliers based on industry',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  userId: {
-                    type: 'string',
-                    example: 'userId123'
-                  }
-                }
-              }
-            }
-          },
-          responses: {
-            200: {
-              description: 'List of suppliers based on industry',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      suppliers: {
-                        type: 'array',
-                        items: {
-                          type: 'object',
-                          properties: {
-                            id: { type: 'string' },
-                            name: { type: 'string' },
-                            image: { type: 'string' }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'userId is required'
-            },
-            404: {
-              description: 'User  not found'
-            },
-            403: {
-              description: 'Access denied'
-            },
-            500: {
-              description: 'Internal server error'
+   '/supplier-service': {
+  post: {
+    tags: ['Dashboard'],
+    summary: 'Get suppliers based on industry',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              userId: { type: 'string', example: 'userId123' }
             }
           }
         }
       }
     },
-    '/retailer/dashboard': {
-      post: {
-        tags: ['Dashboard'],
-        summary: 'Get retailer dashboard data',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  userId: {
-                    type: 'string',
-                    example: 'userId123'
-                  }
-                }
-              }
-            }
-          },
-          responses: {
-            200: {
-              description: 'Retailer dashboard data',
-              content: {
-                'application/json': {
-                  schema: {
+    responses: {
+      200: {
+        description: 'List of suppliers based on industry',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                suppliers: {
+                  type: 'array',
+                  items: {
                     type: 'object',
                     properties: {
-                      featured: { type: 'array', items: { type: 'object' } },
-                      hotPicks: { type: 'array', items: { type: 'object' } },
-                      lastChance: { type: 'array', items: { type: 'object' } },
-                      competitors: { type: 'array', items: { type: 'object' } }
+                      id: { type: 'string' },
+                      name: { type: 'string' },
+                      image: { type: 'string' }
                     }
                   }
                 }
               }
-            },
-            400: {
-              description: 'User  Id is required'
-            },
-            403: {
-              description: 'Access denied'
-            },
-            500: {
-              description: 'Internal server error'
+            }
+          }
+        }
+      },
+      400: { description: 'userId is required' },
+      403: { description: 'Access denied' },
+      404: { description: 'User not found' },
+      500: { description: 'Internal server error' }
+    }
+  }
+},
+
+'/retailer/dashboard': {
+  post: {
+    tags: ['Dashboard'],
+    summary: 'Get retailer dashboard data',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              userId: { type: 'string', example: 'userId123' }
             }
           }
         }
       }
     },
-    '/supplier/dashboard': {
-      post: {
-        tags: ['Dashboard'],
-        summary: 'Get supplier dashboard data',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  userId: {
-                    type: 'string',
-                    example: 'userId123'
-                  }
-                }
+    responses: {
+      200: {
+        description: 'Retailer dashboard data',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                featured: { type: 'array', items: { type: 'object' } },
+                hotPicks: { type: 'array', items: { type: 'object' } },
+                lastChance: { type: 'array', items: { type: 'object' } },
+                competitors: { type: 'array', items: { type: 'object' } }
               }
             }
-          },
-          responses: {
-            200: {
-              description: 'Supplier dashboard data',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      featured: { type: 'array', items: { type: 'object' } },
-                      lowInStock: { type: 'array', items: { type: 'object' } },
-                      competitors: { type: 'array', items: { type: 'object' } }
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'User  Id is required'
-            },
-            403: {
-              description: 'Access denied'
-            },
-            500: {
-              description: 'Internal server error'
+          }
+        }
+      },
+      400: { description: 'User Id is required' },
+      403: { description: 'Access denied' },
+      500: { description: 'Internal server error' }
+    }
+  }
+},
+
+'/supplier/dashboard': {
+  post: {
+    tags: ['Dashboard'],
+    summary: 'Get supplier dashboard data',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              userId: { type: 'string', example: 'userId123' }
             }
           }
         }
       }
     },
-    '/updating-profile': {
-      post: {
-        tags: ['Profile'],
-        summary: 'Update user profile',
-        requestBody: {
-          required: true,
-          content: {
-            'multipart/form-data': {
-              schema: {
-                type: 'object',
-                properties: {
-                  image: {
-                    type: 'string',
-                    format: 'binary'
-                  },
-                  firstName: {
-                    type: 'string',
-                    example: 'John'
-                  },
-                  lastName: {
-                    type: 'string',
-                    example: 'Doe'
-                  }
-                }
+    responses: {
+      200: {
+        description: 'Supplier dashboard data',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                featured: { type: 'array', items: { type: 'object' } },
+                lowInStock: { type: 'array', items: { type: 'object' } },
+                competitors: { type: 'array', items: { type: 'object' } }
               }
             }
-          },
-          responses: {
-            200: {
-              description: 'Profile updated successfully',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      message: { type: 'string', example: 'Profile updated successfully' },
-                      data: { type: 'object' } // Include user data structure if needed
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'User  ID is required or image file is missing'
-            },
-            404: {
-              description: 'User  not found'
-            },
-            500: {
-              description: 'Internal server error'
+          }
+        }
+      },
+      400: { description: 'User Id is required' },
+      403: { description: 'Access denied' },
+      500: { description: 'Internal server error' }
+    }
+  }
+},
+
+'/updating-profile': {
+  post: {
+    tags: ['Profile'],
+    summary: 'Update user profile',
+    requestBody: {
+      required: true,
+      content: {
+        'multipart/form-data': {
+          schema: {
+            type: 'object',
+            properties: {
+              image: { type: 'string', format: 'binary' },
+              firstName: { type: 'string', example: 'John' },
+              lastName: { type: 'string', example: 'Doe' }
             }
           }
         }
       }
     },
-    '/change-password': {
-      post: {
-        tags: ['Authentication'],
-        summary: 'Change user password',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['oldPassword', 'newPassword'],
-                properties: {
-                  oldPassword: {
-                    type: 'string',
-                    example: 'oldpassword123'
-                  },
-                  newPassword: {
-                    type: 'string',
-                    example: 'newpassword123'
-                  }
-                }
+    responses: {
+      200: {
+        description: 'Profile updated successfully',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                message: { type: 'string', example: 'Profile updated successfully' },
+                data: { type: 'object' } // user data structure if needed
               }
             }
-          },
-          responses: {
-            200: {
-              description: 'Password changed successfully',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      message: { type: 'string', example: 'Password changed successfully' }
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'Both old and new passwords are required'
-            },
-            403: {
-              description: 'Old password is incorrect'
-            },
-            404: {
-              description: 'User  not found'
-            },
-            500: {
-              description: 'Internal server error'
+          }
+        }
+      },
+      400: { description: 'User ID is required or image file is missing' },
+      404: { description: 'User not found' },
+      500: { description: 'Internal server error' }
+    }
+  }
+},
+
+'/change-password': {
+  post: {
+    tags: ['Authentication'],
+    summary: 'Change user password',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['oldPassword', 'newPassword'],
+            properties: {
+              oldPassword: { type: 'string', example: 'oldpassword123' },
+              newPassword: { type: 'string', example: 'newpassword123' }
             }
           }
         }
       }
     },
-    '/addresses': {
-      post: {
-        tags: ['Address'],
-        summary: 'Add a new address',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['nickname', 'street', 'phone_number', 'latitude', 'longitude'],
-                properties: {
-                  nickname: { type: 'string', example: 'Home' },
-                  street: { type: 'string', example: '123 Main St' },
-                  building: { type: 'string', example: 'Building A' },
-                  apartment: { type: 'string', example: 'Apt 1' },
-                  phone_number: { type: 'string', example: '1234567890' },
-                  latitude: { type: 'number', example: 40.7128 },
-                  longitude: { type: 'number', example: -74.0060 }
-                }
+    responses: {
+      200: {
+        description: 'Password changed successfully',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                message: { type: 'string', example: 'Password changed successfully' }
               }
             }
-          },
-          responses: {
-            201: {
-              description: 'Address added successfully',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean', example: true },
-                      message: { type: 'string', example: 'Address added successfully.' },
-                      data: { type: 'object' } // Include address data structure if needed
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'Validation failed'
-            },
-            500: {
-              description: 'An error occurred while adding the address'
+          }
+        }
+      },
+      400: { description: 'Both old and new passwords are required' },
+      403: { description: 'Old password is incorrect' },
+      404: { description: 'User not found' },
+      500: { description: 'Internal server error' }
+    }
+  }
+},
+
+'/addresses': {
+  post: {
+    tags: ['Address'],
+    summary: 'Add a new address',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['nickname', 'street', 'phone_number', 'latitude', 'longitude'],
+            properties: {
+              nickname: { type: 'string', example: 'Home' },
+              street: { type: 'string', example: '123 Main St' },
+              building: { type: 'string', example: 'Building A' },
+              apartment: { type: 'string', example: 'Apt 1' },
+              phone_number: { type: 'string', example: '1234567890' },
+              latitude: { type: 'number', example: 40.7128 },
+              longitude: { type: 'number', example: -74.0060 }
             }
           }
         }
       }
     },
+    responses: {
+      201: {
+        description: 'Address added successfully',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                success: { type: 'boolean', example: true },
+                message: { type: 'string', example: 'Address added successfully.' },
+                data: { type: 'object' } // address data structure if needed
+              }
+            }
+          }
+        }
+      },
+      400: { description: 'Validation failed' },
+      500: { description: 'An error occurred while adding the address' }
+    }
+  }
+},
+
     '/all-addresses': {
       get: {
         tags: ['Address'],
@@ -891,7 +835,7 @@ module.exports = {
                     properties: {
                       success: { type: 'boolean', example: true },
                       message: { type: 'string', example: 'Address updated successfully' },
-                      data: { type: 'object' } // Include updated address data structure if needed
+                      data: { type: 'object' }
                     }
                   }
                 }
@@ -945,158 +889,143 @@ module.exports = {
       }
     },
     '/change-language': {
-      post: {
-        tags: ['Profile'],
-        summary: 'Change user language preference',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['language'],
-                properties: {
-                  language: {
-                    type: 'string',
-                    enum: ['en', 'ar', 'fr'],
-                    example: 'en'
-                  }
-                }
+  post: {
+    tags: ['Profile'],
+    summary: 'Change user language preference',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['language'],
+            properties: {
+              language: {
+                type: 'string',
+                enum: ['en', 'ar', 'fr'],
+                example: 'en'
               }
-            }
-          },
-          responses: {
-            200: {
-              description: 'Language updated successfully',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      success: { type: 'boolean', example: true },
-                      message: { type: 'string', example: 'Language updated successfully.' },
-                      _id: { type: 'string' },
-                      language: { type: 'string' }
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'Invalid language code'
-            },
-            404: {
-              description: 'User  not found'
-            },
-            500: {
-              description: 'Internal server error'
             }
           }
         }
       }
     },
-    '/retailer/competitors': {
-      post: {
-        tags: ['Dashboard'],
-        summary: 'Get competitors for retailers',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  userId: {
-                    type: 'string',
-                    example: 'userId123'
-                  }
-                }
+    responses: {
+      200: {
+        description: 'Language updated successfully',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                success: { type: 'boolean', example: true },
+                message: { type: 'string', example: 'Language updated successfully.' },
+                _id: { type: 'string' },
+                language: { type: 'string' }
               }
             }
-          },
-          responses: {
-            200: {
-              description: 'List of competitors for retailers',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        id: { type: 'string' },
-                        name: { type: 'string' },
-                        image: { type: 'string' }
-                      }
-                    }
-                  }
-                }
+          }
+        }
+      },
+      400: { description: 'Invalid language code' },
+      404: { description: 'User not found' },
+      500: { description: 'Internal server error' }
+    }
+  }
+},
+
+'/retailer/competitors': {
+  post: {
+    tags: ['Dashboard'],
+    summary: 'Get competitors for retailers',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              userId: {
+                type: 'string',
+                example: 'userId123'
               }
-            },
-            400: {
-              description: 'User  ID is required'
-            },
-            403: {
-              description: 'Access denied'
-            },
-            500: {
-              description: 'Internal server error'
             }
           }
         }
       }
     },
-    '/supplier/competitors': {
-      post: {
-        tags: ['Dashboard'],
-        summary: 'Get competitors for suppliers',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
+    responses: {
+      200: {
+        description: 'List of competitors for retailers',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: {
                 type: 'object',
                 properties: {
-                  userId: {
-                    type: 'string',
-                    example: 'userId123'
-                  }
+                  id: { type: 'string' },
+                  name: { type: 'string' },
+                  image: { type: 'string' }
                 }
               }
             }
-          },
-          responses: {
-            200: {
-              description: 'List of competitors for suppliers',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'array',
-                    items: {
-                      type: 'object',
-                      properties: {
-                        id: { type: 'string' },
-                        name: { type: 'string' },
-                        image: { type: 'string' }
-                      }
-                    }
-                  }
-                }
+          }
+        }
+      },
+      400: { description: 'User ID is required' },
+      403: { description: 'Access denied' },
+      500: { description: 'Internal server error' }
+    }
+  }
+},
+
+'/supplier/competitors': {
+  post: {
+    tags: ['Dashboard'],
+    summary: 'Get competitors for suppliers',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              userId: {
+                type: 'string',
+                example: 'userId123'
               }
-            },
-            400: {
-              description: 'User  ID is required'
-            },
-            403: {
-              description: 'Access denied'
-            },
-            500: {
-              description: 'Internal server error'
             }
           }
         }
       }
     },
+    responses: {
+      200: {
+        description: 'List of competitors for suppliers',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string' },
+                  name: { type: 'string' },
+                  image: { type: 'string' }
+                }
+              }
+            }
+          }
+        }
+      },
+      400: { description: 'User ID is required' },
+      403: { description: 'Access denied' },
+      500: { description: 'Internal server error' }
+    }
+  }
+},
+
     '/delete': {
       delete: {
         tags: ['User  '],
@@ -1349,63 +1278,63 @@ module.exports = {
       }
     },
     '/social-login': {
-      post: {
-        tags: ['Authentication'],
-        summary: 'Social login for users',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['provider', 'access_token'],
-                properties: {
-                  provider: {
-                    type: 'string',
-                    enum: ['google', 'facebook', 'instagram'],
-                    example: 'google'
-                  },
-                  access_token: {
-                    type: 'string',
-                    example: 'your_access_token_here'
-                  },
-                  email: {
-                    type: 'string',
-                    format: 'email',
-                    example: 'user@example.com'
-                  }
-                }
+  post: {
+    tags: ['Authentication'],
+    summary: 'Social login for users',
+    requestBody: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            required: ['provider', 'access_token'],
+            properties: {
+              provider: {
+                type: 'string',
+                enum: ['google', 'facebook', 'instagram'],
+                example: 'google'
+              },
+              access_token: {
+                type: 'string',
+                example: 'your_access_token_here'
+              },
+              email: {
+                type: 'string',
+                format: 'email',
+                example: 'user@example.com'
               }
-            }
-          },
-          responses: {
-            200: {
-              description: 'User  logged in successfully',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      sub: { type: 'string', example: '1234567890' },
-                      name: { type: 'string', example: 'John Doe' },
-                      email: { type: 'string', example: 'user@example.com' },
-                      picture: { type: 'string', example: 'http://example.com/image.jpg' }
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'Bad request, missing fields or unsupported provider'
-            },
-            500: {
-              description: 'Internal server error'
             }
           }
         }
       }
+    },
+    responses: {
+      200: {
+        description: 'User logged in successfully',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                sub: { type: 'string', example: '1234567890' },
+                name: { type: 'string', example: 'John Doe' },
+                email: { type: 'string', example: 'user@example.com' },
+                picture: { type: 'string', example: 'http://example.com/image.jpg' }
+              }
+            }
+          }
+        }
+      },
+      400: {
+        description: 'Bad request, missing fields or unsupported provider'
+      },
+      500: {
+        description: 'Internal server error'
+      }
     }
-  },
+  }
+},
+
   
   components: {
     securitySchemes: {
@@ -1416,4 +1345,5 @@ module.exports = {
       }
     }
   }
-};
+}
+}
