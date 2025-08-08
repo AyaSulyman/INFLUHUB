@@ -48,8 +48,8 @@ module.exports = {
                   }
                 }
               }
-            },
-        
+            }
+          },
           responses: {
             200: {
               description: 'Message created successfully',
@@ -67,14 +67,12 @@ module.exports = {
                 }
               }
             },
-            
             400: {
               description: 'Bad request'
             }
           }
         }
-      }
-        },
+      },
       get: {
         tags: ['Messages'],
         summary: 'Get all messages',
@@ -136,7 +134,22 @@ module.exports = {
             }
           },
           responses: {
-           
+            201: {
+              description: 'User  registered successfully, OTP sent to email',
+              content: {
+                'application/json': {
+                  schema: {
+                    type:'object',
+                    properties: {
+                      message: { type: 'string', example: 'OTP sent to your email for verification' }
+                    }
+                  }
+                }
+              }
+            },
+            400: {
+              description: 'Invalid input or email already exists'
+            }
           }
         }
       }
