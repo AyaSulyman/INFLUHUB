@@ -36,43 +36,45 @@ module.exports = {
         tags: ['Messages'],
         summary: 'Create a new message',
         requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  content: {
-                    type: 'string',
-                    example: 'Hello, this is a message.'
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "Hello, this is a message."
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        responses: {
+          "200": {
+            "description": "Message created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": { "type": "string", "example": "60d5ec49f1b2c8b1f8e4e1a1" },
+                    "content": { "type": "string", "example": "Hello, this is a message." },
+                    "createdAt": { "type": "string", "format": "date-time", "example": "2021-06-24T12:00:00Z" },
+                    "updatedAt": { "type": "string", "format": "date-time", "example": "2021-06-24T12:00:00Z" }
                   }
                 }
               }
             }
           },
-          responses: {
-            200: {
-              description: 'Message created successfully',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      _id: { type: 'string', example: '60d5ec49f1b2c8b1f8e4e1a1' },
-                      content: { type: 'string', example: 'Hello, this is a message.' },
-                      createdAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' },
-                      updatedAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' }
-                    }
-                  }
-                }
-              }
-            },
-            400: {
-              description: 'Bad request'
-            }
+          "400": {
+            "description": "Bad request"
           }
         }
       },
+
       get: {
         tags: ['Messages'],
         summary: 'Get all messages',
