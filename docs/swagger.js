@@ -36,45 +36,43 @@ module.exports = {
         tags: ['Messages'],
         summary: 'Create a new message',
         requestBody: {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "content": {
-                    "type": "string",
-                    "example": "Hello, this is a message."
-                  }
-                }
-              }
-            }
-          }
-        },
-
-        responses: {
-          "200": {
-            "description": "Message created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "_id": { "type": "string", "example": "60d5ec49f1b2c8b1f8e4e1a1" },
-                    "content": { "type": "string", "example": "Hello, this is a message." },
-                    "createdAt": { "type": "string", "format": "date-time", "example": "2021-06-24T12:00:00Z" },
-                    "updatedAt": { "type": "string", "format": "date-time", "example": "2021-06-24T12:00:00Z" }
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  content: {
+                    type: 'string',
+                    example: 'Hello, this is a message.'
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad request"
+          responses: {
+            200: {
+              description: 'Message created successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      _id: { type: 'string', example: '60d5ec49f1b2c8b1f8e4e1a1' },
+                      content: { type: 'string', example: 'Hello, this is a message.' },
+                      createdAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' },
+                      updatedAt: { type: 'string', format: 'date-time', example: '2021-06-24T12:00:00Z' }
+                    }
+                  }
+                }
+              }
+            },
+            400: {
+              description: 'Bad request'
+            }
           }
         }
       },
-
       get: {
         tags: ['Messages'],
         summary: 'Get all messages',
@@ -108,66 +106,54 @@ module.exports = {
       post: {
         tags: ['Authentication'],
         summary: 'Register a new user',
-        requestBody:
-        {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["Email", "Password", "ConfirmPassword"],
-                "properties": {
-                  "Email": {
-                    "type": "string",
-                    "format": "email",
-                    "example": "user@example.com"
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['Email', 'Password', 'ConfirmPassword'],
+                properties: {
+                  Email: {
+                    type: 'string',
+                    format: 'email',
+                    example: 'user@example.com'
                   },
-                  "Password": {
-                    "type": "string",
-                    "format": "password",
-                    "example": "password123"
+                  Password: {
+                    type: 'string',
+                    format: 'password',
+                    example: 'password123'
                   },
-                  "ConfirmPassword": {
-                    "type": "string",
-                    "format": "password",
-                    "example": "password123"
-                  }
-                }
-              }
-            }
-          }
-        },
-
-        responses: {
-          "201": {
-            "description": "User  registered successfully, OTP sent to email",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": { "type": "string", "example": "OTP sent to your email for verification" },
-                    "user": {
-                      "type": "object",
-                      "properties": {
-                        "_id": { "type": "string", "example": "60d5ec49f1b2c8b1f8e4e1a1" },
-                        "Email": { "type": "string", "example": "user@example.com" },
-                        "username": { "type": "string", "example": "user123" },
-                        "createdAt": { "type": "string", "format": "date-time", "example": "2021-06-24T12:00:00Z" },
-                        "updatedAt": { "type": "string", "format": "date-time", "example": "2021-06-24T12:00:00Z" }
-                      }
-                    }
+                  ConfirmPassword: {
+                    type: 'string',
+                    format: 'password',
+                    example: 'password123'
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Invalid input or email already exists"
+          responses: {
+            201: {
+              description: 'User  registered successfully, OTP sent to email',
+              content: {
+                'application/json': {
+                  schema: {
+                    type:                    'object',
+                    properties: {
+                      message: { type: 'string', example: 'OTP sent to your email for verification' }
+                    }
+                  }
+                }
+              }
+            },
+            400: {
+              description: 'Invalid input or email already exists'
+            }
           }
         }
-      },
-
+      }
+    },
     '/verify-otp': {
       post: {
         tags: ['Authentication'],
@@ -1521,5 +1507,4 @@ module.exports = {
       }
     }
   }
-}
-}
+};
