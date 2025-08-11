@@ -35,28 +35,20 @@ const UserSchema = new mongoose.Schema({
     },
     ConfirmPassword: {
         type: String,
-        required: true,
         trim: true,
         minlength: 8,
-        validate(val) {
-            if (val.length < 8) {
-                throw new Error("password must be greater than 8");
-            }
-        }
     },
     CountryCode: {
         type: Number,
-        required: true,
         trim: true,
     },
     PhoneNumber: {
         type: Number,
-        required: true,
         trim: true,
     },
     userType: {
         type: String,
-        required: true
+        
     },
     Industry: {
         type: String,
@@ -100,14 +92,14 @@ const UserSchema = new mongoose.Schema({
             return this.userType === "Supplier" || this.userType === "Retailer";
         }
     },
-   language: {
+    language: {
         type: String,
         default: 'en', 
         required: function() {
             return this.isLanguageChange; 
         }
     },
-   provider: {
+    provider: {
         type: String, 
         default: null,
         required: function() {
@@ -125,6 +117,7 @@ const UserSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
 
 UserSchema.pre("save", async function (next) {
     const user = this;

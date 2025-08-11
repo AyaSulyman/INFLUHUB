@@ -58,14 +58,14 @@ router.get('/message', (req, res) => {
 router.post('/signup', async (req, res) => {
     console.log(req.body);
     const { Email, Password, ConfirmPassword } = req.body;
+
     try {
         if (Password !== ConfirmPassword) {
             return res.status(400).json({ error: "Passwords do not match" });
         }
 
-
-        const existingUser = await User.findOne({ Email });
-        if (existingUser) {
+        const existingUser  = await User.findOne({ Email });
+        if (existingUser ) {
             return res.status(400).json({ error: 'User  with this email already exists' });
         }
 
@@ -82,6 +82,8 @@ router.post('/signup', async (req, res) => {
         });
 
         await user.save();
+
+
 
         //Generate OTP
         const otp = crypto.randomInt(100000, 999999).toString();
