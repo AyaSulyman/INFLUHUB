@@ -57,12 +57,11 @@ router.get('/message', (req, res) => {
 
 router.post('/signup', async (req, res) => {
     console.log(req.body);
-    const { Email, Password, ConfirmPassword } = req.body;
+    const { Email, Password, ConfirmPassword, userType, CountryCode, PhoneNumber } = req.body;
     try {
         if (Password !== ConfirmPassword) {
             return res.status(400).json({ error: "Passwords do not match" });
         }
-
 
         const existingUser = await User.findOne({ Email });
         if (existingUser) {
@@ -78,7 +77,10 @@ router.post('/signup', async (req, res) => {
         const user = new User({
             Email,
             username,
-            Password
+            Password,
+            userType,
+            CountryCode,
+            PhoneNumber
         });
 
         await user.save();
@@ -87,13 +89,10 @@ router.post('/signup', async (req, res) => {
         const otp = crypto.randomInt(100000, 999999).toString();
         otps[Email] = { otp, expires: Date.now() + 300000 };
 
-
         await sendOtpEmail(Email, otp);
 
-
-        res.status(201).json({ message: 'OTP sent to your email for verification' });;
+        res.status(201).json({ message: 'OTP sent to your email for verification' });
     } catch (error) {
-
         res.status(400).json({ error: error.message || "Signup failed" });
     }
 });
