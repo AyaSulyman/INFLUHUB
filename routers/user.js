@@ -1095,7 +1095,7 @@ router.delete('/delete', authenticateToken, async (req, res) => {
     }
 })
 
-//change-language route 
+// Change language route 
 router.post('/change-language', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -1108,10 +1108,11 @@ router.post('/change-language', authenticateToken, async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ error: "User not found." });
+            return res.status(404).json({ error: "User  not found." });
         }
 
         user.language = language;
+        user.isLanguageChange = true; 
         await user.save();
 
         return res.status(200).json({

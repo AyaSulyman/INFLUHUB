@@ -100,17 +100,26 @@ const UserSchema = new mongoose.Schema({
             return this.userType === "Supplier" || this.userType === "Retailer";
         }
     },
-    language: {
+   language: {
         type: String,
-        required: true
+        default: 'en', 
+        required: function() {
+            return this.isLanguageChange; 
+        }
     },
-    provider: {
+   provider: {
         type: String, 
-        default: null
+        default: null,
+        required: function() {
+            return this.userType === 'social'; 
+        }
     },
     social_id: {
         type: String, 
-        default: null
+        default: null,
+        required: function() {
+            return this.userType === 'social'; 
+        }
     },
   
 }, {
