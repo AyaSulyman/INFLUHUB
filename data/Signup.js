@@ -35,7 +35,9 @@ const UserSchema = new mongoose.Schema({
     },
     ConfirmPassword: {
         type: String,
-        required: true,
+        required: function() {
+            return !this.isLanguageChange; // Only required if not changing language
+        },
         trim: true,
         minlength: 8,
         validate(val) {
@@ -46,17 +48,23 @@ const UserSchema = new mongoose.Schema({
     },
     CountryCode: {
         type: Number,
-        required: true,
+        required: function() {
+            return !this.isLanguageChange; // Only required if not changing language
+        },
         trim: true,
     },
     PhoneNumber: {
         type: Number,
-        required: true,
+        required: function() {
+            return !this.isLanguageChange; // Only required if not changing language
+        },
         trim: true,
     },
     userType: {
         type: String,
-        required: true
+        required: function() {
+            return !this.isLanguageChange; // Only required if not changing language
+        }
     },
     Industry: {
         type: String,
@@ -100,14 +108,14 @@ const UserSchema = new mongoose.Schema({
             return this.userType === "Supplier" || this.userType === "Retailer";
         }
     },
-   language: {
+    language: {
         type: String,
         default: 'en', 
         required: function() {
             return this.isLanguageChange; 
         }
     },
-   provider: {
+    provider: {
         type: String, 
         default: null,
         required: function() {
@@ -121,7 +129,6 @@ const UserSchema = new mongoose.Schema({
             return this.userType === 'social'; 
         }
     },
-  
 }, {
     timestamps: true
 });
