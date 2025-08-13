@@ -38,11 +38,12 @@ router.post('/social-login', async (req, res) => {
         let userData;
         let dbUserData = {
             Password: 'sociallogin', // Placeholder for social login
-            ConfirmPassword: 'sociallogin', // Placeholder for social login
+            ConfirmPassword: 'sociallogin',
             CountryCode: 0,
             PhoneNumber: 0,
             userType: 'social',
-            language: 'en'
+            language: 'en',
+            provider, // Save provider name
         };
 
         // Handle Google login
@@ -60,11 +61,10 @@ router.post('/social-login', async (req, res) => {
 
             dbUserData = {
                 ...dbUserData,
-                providerId: data.sub,
+                social_id: data.sub,
                 Email: data.email,
                 username: data.name,
-                avatar: data.picture,
-                provider: 'google' // Save provider information
+                avatar: data.picture
             };
         } 
         // Handle Facebook login
@@ -86,11 +86,10 @@ router.post('/social-login', async (req, res) => {
 
             dbUserData = {
                 ...dbUserData,
-                providerId: data.id,
+                social_id: data.id,
                 Email: data.email || manualEmail,
                 username: data.name,
-                avatar: data.picture?.data?.url || '',
-                provider: 'facebook' // Save provider information
+                avatar: data.picture?.data?.url || ''
             };
         }
 
@@ -105,7 +104,16 @@ router.post('/social-login', async (req, res) => {
 
             // Generate a JWT token for the user
             const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
-            return res.status(200).json({ user: { ...user.toObject(), provider: dbUserData.provider }, token }); 
+
+            // Always return social_id in the response
+            return res.status(200).json({
+                user: {
+                    ...user.toObject(),
+                    provider: dbUserData.provider,
+                    social_id: dbUserData.social_id || user.social_id || null
+                },
+                token
+            });
         }
 
     } catch (error) {
