@@ -9,13 +9,10 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Middleware to authenticate access tokens
 const authenticateToken = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-        return res.sendStatus(401);
-    }
+    if (!token) return res.sendStatus(401);
+
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.sendStatus(403);
-        }
+        if (err) return res.sendStatus(403);
         req.user = user;
         next();
     });
@@ -37,13 +34,13 @@ router.post('/social-login', async (req, res) => {
 
         let userData;
         let dbUserData = {
-            Password: 'sociallogin', // Placeholder for social login
+            Password: 'sociallogin', // Placeholder
             ConfirmPassword: 'sociallogin',
             CountryCode: 0,
             PhoneNumber: 0,
             userType: 'social',
             language: 'en',
-            provider, // Save provider name
+            provider // Save provider name
         };
 
         // Handle Google login
@@ -63,7 +60,7 @@ router.post('/social-login', async (req, res) => {
                 ...dbUserData,
                 social_id: data.sub,
                 Email: data.email,
-                username: data.name,
+                username: `${data.name}_${provider}_${data.sub.slice(-4)}`, // provider-specific username
                 avatar: data.picture
             };
         }
@@ -88,33 +85,47 @@ router.post('/social-login', async (req, res) => {
                 ...dbUserData,
                 social_id: data.id,
                 Email: data.email || manualEmail,
-                username: data.name,
+                username: `${data.name}_${provider}_${data.id.slice(-4)}`, // provider-specific username
                 avatar: data.picture?.data?.url || ''
             };
         }
 
-        // Save or retrieve user
+        // Save or update user
         if (dbUserData.Email) {
             let user = await User.findOne({ Email: dbUserData.Email });
 
             if (!user) {
+                // New user → create
                 user = new User(dbUserData);
                 await user.save();
-            } else if (!user.social_id) {
-                user.social_id = dbUserData.social_id;
-                await user.save();
+            } else {
+                // Existing user → update missing provider, social_id, and username
+                let updated = false;
+                if (!user.social_id && dbUserData.social_id) {
+                    user.social_id = dbUserData.social_id;
+                    updated = true;
+                }
+                if (!user.provider && dbUserData.provider) {
+                    user.provider = dbUserData.provider;
+                    updated = true;
+                }
+                if (!user.username && dbUserData.username) {
+                    user.username = dbUserData.username;
+                    updated = true;
+                }
+                if (updated) await user.save();
             }
 
-
-            // Generate a JWT token for the user
+            // Generate JWT
             const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
-            // Always return social_id in the response
+            // Return user with provider & social_id
             return res.status(200).json({
                 user: {
                     ...user.toObject(),
-                    provider: dbUserData.provider,
-                    social_id: dbUserData.social_id || user.social_id || null
+                    provider: dbUserData.provider || user.provider,
+                    social_id: dbUserData.social_id || user.social_id || null,
+                    username: dbUserData.username || user.username
                 },
                 token
             });
