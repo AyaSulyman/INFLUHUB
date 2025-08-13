@@ -37,14 +37,15 @@ router.post('/social-login', async (req, res) => {
 
         let userData;
         let dbUserData = {
-            Password: 'sociallogin',
-            ConfirmPassword: 'sociallogin',
+            Password: 'sociallogin', // Placeholder for social login
+            ConfirmPassword: 'sociallogin', // Placeholder for social login
             CountryCode: 0,
             PhoneNumber: 0,
             userType: 'social',
             language: 'en'
         };
 
+        // Handle Google login
         if (provider === 'google') {
             const { data } = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: { Authorization: `Bearer ${access_token}` }
@@ -63,9 +64,11 @@ router.post('/social-login', async (req, res) => {
                 Email: data.email,
                 username: data.name,
                 avatar: data.picture,
-                provider: 'google'
+                provider: 'google' // Save provider information
             };
-        } else if (provider === 'facebook') {
+        } 
+        // Handle Facebook login
+        else if (provider === 'facebook') {
             const { data } = await axios.get(`https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${access_token}`);
 
             if (!data.email && !manualEmail) {
@@ -87,7 +90,7 @@ router.post('/social-login', async (req, res) => {
                 Email: data.email || manualEmail,
                 username: data.name,
                 avatar: data.picture?.data?.url || '',
-                provider: 'facebook'
+                provider: 'facebook' // Save provider information
             };
         }
 
@@ -100,8 +103,9 @@ router.post('/social-login', async (req, res) => {
                 await user.save();
             }
 
+            // Generate a JWT token for the user
             const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
-            return res.status(200).json({ user: user, token }); 
+            return res.status(200).json({ user: { ...user.toObject(), provider: dbUserData.provider }, token }); 
         }
 
     } catch (error) {
