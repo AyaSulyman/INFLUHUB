@@ -30,7 +30,7 @@ router.post('/social-login', async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
-        const validProviders = ['google', 'facebook', 'instagram'];
+        const validProviders = ['google', 'facebook']; 
         if (!validProviders.includes(provider)) {
             return res.status(400).json({ error: "Unsupported provider" });
         }
@@ -65,9 +65,7 @@ router.post('/social-login', async (req, res) => {
                 avatar: data.picture,
                 provider: 'google'
             };
-        }
-
-        else if (provider === 'facebook') {
+        } else if (provider === 'facebook') {
             const { data } = await axios.get(`https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${access_token}`);
 
             if (!data.email && !manualEmail) {
@@ -93,29 +91,6 @@ router.post('/social-login', async (req, res) => {
             };
         }
 
-        else if (provider === 'instagram') {
-            const { data } = await axios.get(`https://graph.instagram.com/me?fields=id,username,account_type&access_token=${access_token}`);
-
-            if (!manualEmail) {
-                return res.status(400).json({ error: "Instagram requires email manually" });
-            }
-
-            userData = {
-                id: data.id,
-                username: data.username,
-                account_type: data.account_type
-            };
-
-            dbUserData = {
-                ...dbUserData,
-                providerId: data.id,
-                Email: manualEmail,
-                username: data.username,
-                avatar: '',
-                provider: 'instagram'
-            };
-        }
-
         // Save or retrieve user
         if (dbUserData.Email) {
             let user = await User.findOne({ Email: dbUserData.Email });
@@ -126,11 +101,8 @@ router.post('/social-login', async (req, res) => {
             }
 
             const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
-            
+            return res.status(200).json({ user: user, token }); 
         }
-
-        
-        return res.status(200).json(userData);
 
     } catch (error) {
         console.error("Social login error:", error.response?.data || error.message);
