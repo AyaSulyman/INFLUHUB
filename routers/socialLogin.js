@@ -30,7 +30,7 @@ router.post('/social-login', async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
-        const validProviders = ['google', 'facebook']; 
+        const validProviders = ['google', 'facebook'];
         if (!validProviders.includes(provider)) {
             return res.status(400).json({ error: "Unsupported provider" });
         }
@@ -66,7 +66,7 @@ router.post('/social-login', async (req, res) => {
                 username: data.name,
                 avatar: data.picture
             };
-        } 
+        }
         // Handle Facebook login
         else if (provider === 'facebook') {
             const { data } = await axios.get(`https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${access_token}`);
@@ -100,7 +100,11 @@ router.post('/social-login', async (req, res) => {
             if (!user) {
                 user = new User(dbUserData);
                 await user.save();
+            } else if (!user.social_id) {
+                user.social_id = dbUserData.social_id;
+                await user.save();
             }
+
 
             // Generate a JWT token for the user
             const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
