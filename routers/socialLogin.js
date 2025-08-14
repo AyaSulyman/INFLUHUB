@@ -8,14 +8,14 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware to authenticate access tokens
 const authenticateToken = (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) return res.sendStatus(401);
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) return res.sendStatus(401);
 
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
 };
 
 // Social login
@@ -43,9 +43,9 @@ router.post('/social-login', async (req, res) => {
       provider
     };
 
-    // Exchange code for access token & fetch user info
+
     if (provider === "google") {
-      // Exchange code for token
+
       const tokenRes = await axios.post(
         `https://oauth2.googleapis.com/token`,
         new URLSearchParams({
@@ -77,22 +77,12 @@ router.post('/social-login', async (req, res) => {
     }
 
     else if (provider === "facebook") {
-      // Exchange code for token
-      const tokenRes = await axios.get(
-        `https://graph.facebook.com/v18.0/oauth/access_token`,
-        {
-          params: {
-            client_id: process.env.FB_APP_ID,
-            client_secret: process.env.FB_APP_SECRET,
-            redirect_uri: process.env.FB_REDIRECT_URI,
-            code
-          }
-        }
-      );
+      const { access_token } = req.body; 
+      if (!access_token) {
+        return res.status(400).json({ error: "Facebook access token is required" });
+      }
 
-      const access_token = tokenRes.data.access_token;
-
-      // Fetch user info
+      // Fetch user info directly
       const { data } = await axios.get(
         "https://graph.facebook.com/me",
         {
@@ -116,6 +106,7 @@ router.post('/social-login', async (req, res) => {
         avatar: data.picture?.data?.url || ""
       };
     }
+
 
     // Save or update user in DB
     let user = await User.findOne({ Email: dbUserData.Email });
