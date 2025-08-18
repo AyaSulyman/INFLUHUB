@@ -26,28 +26,27 @@ router.post('/social-login', async (req, res) => {
 
     let userData;
 
-   
+
     let dbUserData = {
       Password: "Social@1234",
       ConfirmPassword: "Social@1234",
       CountryCode: 0,
       PhoneNumber: 0,
-      userType: "Retailer",
+      userType: "Retailer",   
       language: "en",
       provider,
-
-  
       Industry: "N/A",
       Degree: "N/A",
       Type: "N/A",
       Capital: "0",
       DigitalPresence: "N/A",
       isFreelancer: "N/A",
-      image: "https://dummyimage.com/200x200/cccccc/000000&text=User"
+      image: "https://dummyimage.com/200x200/cccccc/000000&text=User",
+      avatar: "https://dummyimage.com/200x200/cccccc/000000&text=User"
     };
 
     if (provider === "google") {
-     
+    
       const ticket = await googleClient.verifyIdToken({
         idToken: accessToken,
         audience: GOOGLE_CLIENT_ID
@@ -61,29 +60,34 @@ router.post('/social-login', async (req, res) => {
         social_id: payload.sub,
         Email: payload.email,
         username: `${payload.name}_${provider}_${payload.sub.slice(-4)}`,
-        avatar: payload.picture
+        avatar: payload.picture || dbUserData.avatar
       };
 
     } else if (provider === "facebook") {
-   
-      const { data } = await axios.get(
-        "https://graph.facebook.com/me",
-        {
-          params: { fields: "id,name,email,picture", access_token: accessToken }
-        }
-      );
+
+      const { data } = await axios.get("https://graph.facebook.com/me", {
+        params: { fields: "id,name,email,picture", access_token: accessToken }
+      });
 
       const finalEmail = data.email || manualEmail || `${data.id}@facebook.com`;
-
       userData = data;
+
       dbUserData = {
         ...dbUserData,
         social_id: data.id,
         Email: finalEmail,
         username: `${data.name}_${provider}_${data.id.slice(-4)}`,
-        avatar: data.picture?.data?.url || ""
+        avatar: data.picture?.data?.url || dbUserData.avatar,
+      
+        Industry: dbUserData.Industry || "N/A",
+        Degree: dbUserData.Degree || "N/A",
+        isFreelancer: dbUserData.isFreelancer || "N/A",
+        image: dbUserData.image || "https://dummyimage.com/200x200/cccccc/000000&text=User"
       };
     }
+
+ 
+    console.log("dbUserData before save/update:", dbUserData);
 
     // Save or update user in DB
     let user = await User.findOne({ Email: dbUserData.Email });
