@@ -2,21 +2,13 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const { OAuth2Client } = require('google-auth-library');
 const User = require('../data/Signup');
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-// Middleware to authenticate access tokens
-const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // Social login
 router.post('/social-login', async (req, res) => {
@@ -33,34 +25,47 @@ router.post('/social-login', async (req, res) => {
     }
 
     let userData;
+
+   
     let dbUserData = {
-      Password: "sociallogin",
-      ConfirmPassword: "sociallogin",
+      Password: "Social@1234",
+      ConfirmPassword: "Social@1234",
       CountryCode: 0,
       PhoneNumber: 0,
       userType: "Retailer",
       language: "en",
-      provider
+      provider,
+
+  
+      Industry: "N/A",
+      Degree: "N/A",
+      Type: "N/A",
+      Capital: "0",
+      DigitalPresence: "N/A",
+      isFreelancer: "N/A",
+      image: "https://dummyimage.com/200x200/cccccc/000000&text=User"
     };
 
-
     if (provider === "google") {
-      // Fetch user info from Google
-      const { data } = await axios.get(
-        "https://www.googleapis.com/oauth2/v3/userinfo",
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
+     
+      const ticket = await googleClient.verifyIdToken({
+        idToken: accessToken,
+        audience: GOOGLE_CLIENT_ID
+      });
 
-      userData = data;
+      const payload = ticket.getPayload();
+      userData = payload;
+
       dbUserData = {
         ...dbUserData,
-        social_id: data.sub,
-        Email: data.email,
-        username: `${data.name}_${provider}_${data.sub.slice(-4)}`,
-        avatar: data.picture
+        social_id: payload.sub,
+        Email: payload.email,
+        username: `${payload.name}_${provider}_${payload.sub.slice(-4)}`,
+        avatar: payload.picture
       };
+
     } else if (provider === "facebook") {
-      // Fetch user info from Facebook
+   
       const { data } = await axios.get(
         "https://graph.facebook.com/me",
         {
@@ -68,18 +73,13 @@ router.post('/social-login', async (req, res) => {
         }
       );
 
-      if (!data.email && !manualEmail) {
-        return res.status(400).json({
-          error: "Facebook email not found. Please provide manually.",
-          needManualEmail: true
-        });
-      }
+      const finalEmail = data.email || manualEmail || `${data.id}@facebook.com`;
 
       userData = data;
       dbUserData = {
         ...dbUserData,
         social_id: data.id,
-        Email: data.email || manualEmail,
+        Email: finalEmail,
         username: `${data.name}_${provider}_${data.id.slice(-4)}`,
         avatar: data.picture?.data?.url || ""
       };
@@ -102,7 +102,6 @@ router.post('/social-login', async (req, res) => {
       }
       if (updated) await user.save();
     }
-
 
     // Generate JWT
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
