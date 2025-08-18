@@ -8,14 +8,14 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware to authenticate access tokens
 const authenticateToken = (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) return res.sendStatus(401);
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) return res.sendStatus(401);
 
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
 };
 
 // Social login
@@ -38,10 +38,11 @@ router.post('/social-login', async (req, res) => {
       ConfirmPassword: "sociallogin",
       CountryCode: 0,
       PhoneNumber: 0,
-      userType: "social",
+      userType: "Retailer",
       language: "en",
       provider
     };
+
 
     if (provider === "google") {
       // Fetch user info from Google
@@ -94,8 +95,14 @@ router.post('/social-login', async (req, res) => {
       if (!user.social_id && dbUserData.social_id) { user.social_id = dbUserData.social_id; updated = true; }
       if (!user.provider && dbUserData.provider) { user.provider = dbUserData.provider; updated = true; }
       if (!user.username && dbUserData.username) { user.username = dbUserData.username; updated = true; }
+
+      if (user.userType !== "Retailer" && user.userType !== "Supplier") {
+        user.userType = "Retailer";
+        updated = true;
+      }
       if (updated) await user.save();
     }
+
 
     // Generate JWT
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
