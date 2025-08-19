@@ -10,13 +10,12 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-
 // Social login
 router.post('/social-login', async (req, res) => {
   try {
-    const { provider, accessToken: idTokenOrAccessToken, email: manualEmail } = req.body;
+    const { provider, accessToken, email: manualEmail } = req.body;
 
-    if (!provider || !idTokenOrAccessToken) {
+    if (!provider || !accessToken) {
       return res.status(400).json({ error: "Provider and access token are required" });
     }
 
@@ -29,7 +28,6 @@ router.post('/social-login', async (req, res) => {
       return res.status(400).json({ error: "Unsupported provider" });
     }
 
-    let userData;
     let dbUserData = {
       Password: "Social@1234",
       ConfirmPassword: "Social@1234",
@@ -47,15 +45,17 @@ router.post('/social-login', async (req, res) => {
       image: "https://dummyimage.com/200x200/cccccc/000000&text=User"
     };
 
+    let socialData;
 
     if (provider === "google") {
+
       const ticket = await googleClient.verifyIdToken({
-        idToken: idTokenOrAccessToken,
+        idToken: accessToken,
         audience: GOOGLE_CLIENT_ID
       });
 
       const payload = ticket.getPayload();
-      userData = payload;
+      socialData = payload;
 
       dbUserData = {
         ...dbUserData,
@@ -67,12 +67,12 @@ router.post('/social-login', async (req, res) => {
 
     } else if (provider === "facebook") {
       const { data } = await axios.get("https://graph.facebook.com/me", {
-        params: { fields: "id,name,email,picture", access_token: idTokenOrAccessToken }
+        params: { fields: "id,name,email,picture", access_token: accessToken }
       });
 
-      const finalEmail = data.email || manualEmail || `${data.id}@facebook.com`;
-      userData = data;
+      socialData = data;
 
+      const finalEmail = data.email || manualEmail || `${data.id}@facebook.com`;
       dbUserData = {
         ...dbUserData,
         social_id: data.id,
@@ -97,12 +97,14 @@ router.post('/social-login', async (req, res) => {
       }
     } else {
       let updated = false;
+
       if (!user.social_id && dbUserData.social_id) { user.social_id = dbUserData.social_id; updated = true; }
       if (!user.provider && dbUserData.provider) { user.provider = dbUserData.provider; updated = true; }
       if (!user.username && dbUserData.username) { user.username = dbUserData.username; updated = true; }
       if (user.userType !== "Retailer" && user.userType !== "Supplier") {
         user.userType = "Retailer"; updated = true;
       }
+
       if (updated) await user.save();
     }
 
