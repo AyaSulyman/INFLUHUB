@@ -5,13 +5,17 @@ const axios = require('axios');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../data/Signup');
 
-//jwt secret
+// JWT secret
 const JWT_SECRET = process.env.JWT_SECRET;
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+// Use WEB Client ID for backend verification
+const GOOGLE_WEB_CLIENT_ID = process.env.GOOGLE_WEB_CLIENT_ID;
+const googleClient = new OAuth2Client(GOOGLE_WEB_CLIENT_ID);
 
-// Social login
+
+const validProviders = ["google", "facebook"];
+
+// Social login route
 router.post('/social-login', async (req, res) => {
   try {
     const { provider, accessToken, email: manualEmail } = req.body;
@@ -24,11 +28,11 @@ router.post('/social-login', async (req, res) => {
       return res.status(500).json({ error: "Server misconfigured: missing JWT_SECRET" });
     }
 
-    const validProviders = ["google", "facebook"];
     if (!validProviders.includes(provider)) {
       return res.status(400).json({ error: "Unsupported provider" });
     }
 
+    // Default user data
     let dbUserData = {
       Password: "Social@1234",
       ConfirmPassword: "Social@1234",
@@ -48,11 +52,11 @@ router.post('/social-login', async (req, res) => {
 
     let socialData;
 
+    // --- GOOGLE LOGIN ---
     if (provider === "google") {
-
       const ticket = await googleClient.verifyIdToken({
         idToken: accessToken,
-        audience: GOOGLE_CLIENT_ID
+        audience: GOOGLE_WEB_CLIENT_ID 
       });
 
       const payload = ticket.getPayload();
@@ -66,14 +70,15 @@ router.post('/social-login', async (req, res) => {
         image: payload.picture || dbUserData.image
       };
 
+    // --- FACEBOOK LOGIN ---
     } else if (provider === "facebook") {
       const { data } = await axios.get("https://graph.facebook.com/me", {
         params: { fields: "id,name,email,picture", access_token: accessToken }
       });
 
       socialData = data;
-
       const finalEmail = data.email || manualEmail || `${data.id}@facebook.com`;
+
       dbUserData = {
         ...dbUserData,
         social_id: data.id,
@@ -84,6 +89,7 @@ router.post('/social-login', async (req, res) => {
     }
 
     console.log("dbUserData before save/update:", dbUserData);
+
 
     let user = await User.findOne({ Email: dbUserData.Email });
     if (!user) {
@@ -97,18 +103,17 @@ router.post('/social-login', async (req, res) => {
         throw err;
       }
     } else {
+      // Update user with social info if needed
       let updated = false;
-
       if (!user.social_id && dbUserData.social_id) { user.social_id = dbUserData.social_id; updated = true; }
       if (!user.provider && dbUserData.provider) { user.provider = dbUserData.provider; updated = true; }
       if (!user.username && dbUserData.username) { user.username = dbUserData.username; updated = true; }
-      if (user.userType !== "Retailer" && user.userType !== "Supplier") {
-        user.userType = "Retailer"; updated = true;
-      }
+      if (user.userType !== "Retailer" && user.userType !== "Supplier") { user.userType = "Retailer"; updated = true; }
 
       if (updated) await user.save();
     }
 
+    // --- GENERATE JWT ---
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
 
     return res.status(200).json({
