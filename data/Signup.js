@@ -16,8 +16,8 @@ const UserSchema = new mongoose.Schema({
         lowercase: true,
         unique: true,
         validate(val) {
-            if (validator.isEmpty(val)) {
-                throw new Error("email is invalid");
+            if (!validator.isEmail(val)) {
+                throw new Error("Email is invalid");
             }
         }
     },
@@ -27,9 +27,9 @@ const UserSchema = new mongoose.Schema({
         trim: true,
         minlength: 8,
         validate(value) {
-            let password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_])");
+            let password = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*_])");
             if (!password.test(value)) {
-                throw new Error("password must include uppercase, lowercase, number, and special characters");
+                throw new Error("Password must include uppercase, lowercase, number, and special characters");
             }
         }
     },
@@ -48,76 +48,71 @@ const UserSchema = new mongoose.Schema({
     },
     userType: {
         type: String,
-        
     },
     Industry: {
         type: String,
         required: function () {
             return this.userType === "Supplier" || this.userType === "Retailer";
-        }
+        },
+        default: null
     },
     Degree: {
         type: String,
         required: function () {
             return this.userType === "Retailer";
-        }
+        },
+        default: null
     },
     Type: {
         type: String,
         required: function () {
             return this.userType === "Supplier";
-        }
+        },
+        default: null
     },
     Capital: {
         type: String,
         required: function () {
             return this.userType === "Supplier";
-        }
+        },
+        default: null
     },
     DigitalPresence: {
         type: String,
         required: function () {
             return this.userType === 'Supplier';
-        }
+        },
+        default: null
     },
     isFreelancer: {
         type: String,
         required: function () {
             return this.userType === 'Retailer';
-        }
+        },
+        default: null
     },
     image: {
         type: String, 
         required: function () {
             return this.userType === "Supplier" || this.userType === "Retailer";
-        }
+        },
+        default: "https://dummyimage.com/200x200/cccccc/000000&text=User"
     },
     language: {
         type: String,
-        default: 'en', 
-        required: function() {
-            return this.isLanguageChange; 
-        }
+        default: 'en'
     },
     provider: {
         type: String, 
-        default: null,
-        required: function() {
-            return this.userType === 'social'; 
-        }
+        default: null
     },
     social_id: {
         type: String, 
-        default: null,
-        required: function() {
-            return this.userType === 'social'; 
-        }
+        default: null
     },
-  
 }, {
     timestamps: true
 });
-
 
 UserSchema.pre("save", async function (next) {
     const user = this;
@@ -144,5 +139,5 @@ UserSchema.statics.findByCredentials = async function (email, password) {
     return user;
 };
 
-const User = mongoose.model("User ", UserSchema);
+const User = mongoose.model("User", UserSchema);
 module.exports = User;

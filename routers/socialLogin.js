@@ -13,9 +13,9 @@ const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 // Social login
 router.post('/social-login', async (req, res) => {
   try {
-    const { provider, accessToken, email: manualEmail } = req.body;
+    const { provider, accessToken: idTokenOrAccessToken, email: manualEmail } = req.body;
 
-    if (!provider || !accessToken) {
+    if (!provider || !idTokenOrAccessToken) {
       return res.status(400).json({ error: "Provider and access token are required" });
     }
 
@@ -25,30 +25,28 @@ router.post('/social-login', async (req, res) => {
     }
 
     let userData;
-
-
     let dbUserData = {
       Password: "Social@1234",
       ConfirmPassword: "Social@1234",
       CountryCode: 0,
       PhoneNumber: 0,
-      userType: "Retailer",   
+      userType: "Retailer",
       language: "en",
       provider,
-      Industry: "N/A",
-      Degree: "N/A",
-      Type: "N/A",
-      Capital: "0",
-      DigitalPresence: "N/A",
-      isFreelancer: "N/A",
+      Industry: null,
+      Degree: null,
+      Type: null,
+      Capital: null,
+      DigitalPresence: null,
+      isFreelancer: null,
       image: "https://dummyimage.com/200x200/cccccc/000000&text=User",
       avatar: "https://dummyimage.com/200x200/cccccc/000000&text=User"
     };
 
     if (provider === "google") {
-    
+   
       const ticket = await googleClient.verifyIdToken({
-        idToken: accessToken,
+        idToken: idTokenOrAccessToken,
         audience: GOOGLE_CLIENT_ID
       });
 
@@ -64,9 +62,9 @@ router.post('/social-login', async (req, res) => {
       };
 
     } else if (provider === "facebook") {
-
+     
       const { data } = await axios.get("https://graph.facebook.com/me", {
-        params: { fields: "id,name,email,picture", access_token: accessToken }
+        params: { fields: "id,name,email,picture", access_token: idTokenOrAccessToken }
       });
 
       const finalEmail = data.email || manualEmail || `${data.id}@facebook.com`;
@@ -77,16 +75,10 @@ router.post('/social-login', async (req, res) => {
         social_id: data.id,
         Email: finalEmail,
         username: `${data.name}_${provider}_${data.id.slice(-4)}`,
-        avatar: data.picture?.data?.url || dbUserData.avatar,
-      
-        Industry: dbUserData.Industry || "N/A",
-        Degree: dbUserData.Degree || "N/A",
-        isFreelancer: dbUserData.isFreelancer || "N/A",
-        image: dbUserData.image || "https://dummyimage.com/200x200/cccccc/000000&text=User"
+        avatar: data.picture?.data?.url || dbUserData.avatar
       };
     }
 
- 
     console.log("dbUserData before save/update:", dbUserData);
 
     // Save or update user in DB
@@ -121,8 +113,8 @@ router.post('/social-login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Social login error:", error.response?.data || error.message);
-    return res.status(500).json({ error: "Social login failed" });
+    console.error("Social login error:", error); 
+    return res.status(500).json({ error: error.message || "Social login failed" });
   }
 });
 
