@@ -38,14 +38,15 @@ router.post('/social-login', async (req, res) => {
       userType: "Retailer",
       language: "en",
       provider,
-      Industry: null,
-      Degree: null,
+      Industry: "N/A",
+      Degree: "N/A",
+      isFreelancer: "No",
       Type: null,
       Capital: null,
       DigitalPresence: null,
-      isFreelancer: null,
       image: "https://dummyimage.com/200x200/cccccc/000000&text=User"
     };
+
 
     if (provider === "google") {
       const ticket = await googleClient.verifyIdToken({
@@ -118,7 +119,7 @@ router.post('/social-login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Social login error:", error); 
+    console.error("Social login error:", error);
     return res.status(500).json({ error: error.message || "Social login failed" });
   }
 });
